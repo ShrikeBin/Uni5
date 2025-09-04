@@ -1,0 +1,35 @@
+import numpy as np
+
+A = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+B = np.array([[9, 8, 7], [6, 5, 4], [3, 2, 1]])
+C = A + B
+
+print("Matrix A:")
+print(A)
+print("\nMatrix B:")
+print(B)
+print("\nMatrix C (A + B):")
+print(C)
+print("\nShape of Matrix C:", C.shape)
+print("Data type of Matrix C:", C.dtype)
+print("Number of dimensions of Matrix C:", C.ndim)
+print("Size of Matrix C:", C.size)
+print("Sum of all elements in Matrix C:", np.sum(C))
+print("Mean of all elements in Matrix C:", np.mean(C))
+print("Standard deviation of elements in Matrix C:", np.std(C))
+print("Transpose of Matrix C:")
+print(C.T)
+print("Inverse of Matrix A (if invertible):")
+try:
+    A_inv = np.linalg.inv(A)
+    print(A_inv)
+except np.linalg.LinAlgError:
+    print("Matrix A is not invertible.")
+print("Determinant of Matrix A:", np.linalg.det(A))
+print("Eigenvalues of Matrix A:", np.linalg.eigvals(A))
+print("Eigenvalues of Matrix B:", np.linalg.eigvals(B))
+print("Eigenvalues of Matrix C:", np.linalg.eigvals(C))
+print("Matrix multiplication of A and B:")
+print(np.dot(A, B))
+print("Element-wise multiplication of A and B:")
+print(A * B)
