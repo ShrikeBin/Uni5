@@ -29,31 +29,6 @@ public class Scanner
 		keywords.put("true",  TokenType.TRUE);
 		keywords.put("false", TokenType.FALSE);
 		keywords.put("null",  TokenType.NULL);
-		keywords.put("&&",   TokenType.AND);
-		keywords.put("||",   TokenType.OR);
-		keywords.put("++",   TokenType.PLUS_PLUS);
-		keywords.put("--",   TokenType.MINUS_MINUS);
-		keywords.put("!",    TokenType.NOT);
-		keywords.put("!=",   TokenType.NOT_EQUAL);
-		keywords.put("=",    TokenType.ASSIGN);
-		keywords.put("==",   TokenType.EQUAL);
-		keywords.put("<",    TokenType.LESS);
-		keywords.put("<=",   TokenType.LESS_EQUAL);
-		keywords.put(">",    TokenType.GREATER);
-		keywords.put(">=",   TokenType.GREATER_EQUAL);
-		keywords.put("+",    TokenType.PLUS);
-		keywords.put("-",    TokenType.MINUS);
-		keywords.put("*",    TokenType.STAR);
-		keywords.put("**",   TokenType.POWER);
-		keywords.put("/",    TokenType.SLASH);
-		keywords.put("%",    TokenType.MODULUS);
-		keywords.put(".",    TokenType.DOT);
-		keywords.put(",",    TokenType.COMMA);
-		keywords.put(";",    TokenType.SEMICOLON);
-		keywords.put("(",    TokenType.LEFT_PAREN);
-		keywords.put(")",    TokenType.RIGHT_PAREN);
-		keywords.put("{",    TokenType.LEFT_BRACE);
-		keywords.put("}",    TokenType.RIGHT_BRACE);
 	}
 
 	// In and output

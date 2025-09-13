@@ -26,3 +26,9 @@ y--;
 // math operators
 var z = x * y / 2 % 3;
 var powTest = x ** 2;
+
+/*
+    the king is dead
+
+    LONG LIVE THE king
+*/
