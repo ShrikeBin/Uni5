@@ -32,3 +32,11 @@ var powTest = x ** 2;
 
     LONG LIVE THE king
 */
+
+var kur_wi_ca = 3.
+
+if (kur_wi_ca == 10)
+{
+    foo();
+}
+
