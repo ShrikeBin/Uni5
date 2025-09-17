@@ -73,7 +73,8 @@ public class Scanner
 			case '.': addToken(TokenType.DOT); break;
 			case ';': addToken(TokenType.SEMICOLON); break;
 			case '%': addToken(TokenType.MODULUS); break;
-
+			
+			// double-char tokens
 			case '&': if (match('&')) addToken(TokenType.AND); break;
 			case '|': if (match('|')) addToken(TokenType.OR); break;
 			case '+': if (match('+')) addToken(TokenType.PLUS_PLUS); else addToken(TokenType.PLUS); break;
@@ -84,7 +85,7 @@ public class Scanner
 			case '<': if (match('=')) addToken(TokenType.LESS_EQUAL); else addToken(TokenType.LESS); break;
 			case '>': if (match('=')) addToken(TokenType.GREATER_EQUAL); else addToken(TokenType.GREATER); break;
 
-
+			// comments
 			case '/':
 				if (match('/')) 
 				{
@@ -109,7 +110,7 @@ public class Scanner
 						Spl.error(line, "Unterminated block comment.");
 						return;
 					}
-					
+
 					advance(); // consume '*'
 					advance(); // consume '/'
 				} 
@@ -119,16 +120,20 @@ public class Scanner
 				}
 				break;
 			
+			// whitespaces
 			case ' ':
 			case '\r':
 			case '\t':
 				break;
+
 			case '\n':
 				line++;
 				break;
+
 			case '"':
 				string();
 				break;
+				
 			default:
 				identifier(c);
 				break;
