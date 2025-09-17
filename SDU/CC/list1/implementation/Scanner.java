@@ -86,23 +86,30 @@ public class Scanner
 
 
 			case '/':
-				if (match('/')) {
-					while (peek() != '\n' && !isAtEnd()) {
+				if (match('/')) 
+				{
+					while (peek() != '\n' && !isAtEnd()) 
+					{
 						advance();
 					}
 				} 
 				else if (match('*')) 
 				{
-					while (!(peek() == '*' && peekFurther() == '/') && !isAtEnd()) {
-						if (peek() == '\n') {
+					while (!(peek() == '*' && peekFurther() == '/') && !isAtEnd()) 
+					{
+						if (peek() == '\n') 
+						{
 							line++;
 						}
 						advance();
 					}
-					if (isAtEnd()) {
+
+					if (isAtEnd()) 
+					{
 						Spl.error(line, "Unterminated block comment.");
 						return;
 					}
+					
 					advance(); // consume '*'
 					advance(); // consume '/'
 				} 
