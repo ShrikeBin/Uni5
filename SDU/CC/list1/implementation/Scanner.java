@@ -54,7 +54,7 @@ public class Scanner
 			scanToken();
 		}
 
-		tokens.add(new Token(TokenType.EOF, "", null, line));
+		addToken(TokenType.EOF, "", null);
 		return tokens;
 	}
 
@@ -133,7 +133,7 @@ public class Scanner
 			case '"':
 				string();
 				break;
-				
+
 			default:
 				identifier(c);
 				break;
