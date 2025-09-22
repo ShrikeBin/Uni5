@@ -5,7 +5,7 @@ BIN_DIR = bin
 CLASS_PATH = $(BIN_DIR)
 
 # Java sources
-SOURCES = Spl.java parser/*.java scanner/*.java
+SOURCES = Spl.java parser/*.java scanner/*.java parser/expression/*.java parser/statement/*.java
 
 # Targets
 all:

@@ -4,8 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import spl.Spl;
-import spl.scanner.Token;
-import spl.scanner.TokenType;
+import spl.scanner.*;
+import spl.parser.statement.*;
+import spl.parser.expression.*;
 
 public class Parser 
 {
@@ -60,7 +61,7 @@ public class Parser
 
         consume(TokenType.SEMICOLON, "Expected ';' after variable declaration.");
 
-        return new Var(name, initializer);
+        return new VarDecl(name, initializer);
     }
 
     private Statement statement() throws ParseError 
@@ -72,7 +73,7 @@ public class Parser
 
         if (match(TokenType.LEFT_BRACE)) 
         {
-            return new Statement.Block(block());
+            return new Block(block());
         }
 
         if (match(TokenType.IF))
@@ -104,7 +105,7 @@ public class Parser
             elseBranch = statement();
         }
 
-        return new Statement.If(condition, thenBranch, elseBranch);
+        return new If(condition, thenBranch, elseBranch);
     }
 
     private Statement whileStmt() throws ParseError 
@@ -117,14 +118,14 @@ public class Parser
 
         Statement body = statement();
 
-        return new Statement.While(condition, body);
+        return new While(condition, body);
     }
 
     private Statement printStmt() throws ParseError 
     {
         Expression value = expression();
         consume(TokenType.SEMICOLON, "Expected ';' after value.");
-        return new Statement.Print(value);
+        return new Print(value);
     }
 
     private List<Declaration> block() throws ParseError 
@@ -160,7 +161,7 @@ public class Parser
             Token name = consume(TokenType.IDENTIFIER, "Expected identifier as left operand of assignment.");
             advance();
             Expression value = assignment();
-            return new Expression.Assign(name, value);
+            return new Assign(name, value);
         }
         return or();
     }
@@ -173,7 +174,7 @@ public class Parser
         {
             Token operator = advance();
             Expression right = and();
-            expr = new Expression.Logical(expr, operator, right);
+            expr = new Logical(expr, operator, right);
         }
 
         return expr;
@@ -187,7 +188,7 @@ public class Parser
         {
             Token operator = advance();
             Expression right = equality();
-            expr = new Expression.Logical(expr, operator, right);
+            expr = new Logical(expr, operator, right);
         }
 
         return expr;
@@ -200,7 +201,7 @@ public class Parser
         {
             Token op = advance();
             Expression right = comparison();
-            expr = new Expression.Logical(expr, op, right);
+            expr = new Logical(expr, op, right);
         }
         return expr;
     }
@@ -213,7 +214,7 @@ public class Parser
         {
             Token op = advance();
             Expression right = term();
-            expr = new Expression.Logical(expr, op, right);
+            expr = new Logical(expr, op, right);
         }
 
         return expr;
@@ -226,7 +227,7 @@ public class Parser
         {
             Token op = advance();
             Expression right = factor();
-            expr = new Expression.Binary(expr, op, right);
+            expr = new Binary(expr, op, right);
         }
         return expr;
     }
@@ -238,7 +239,7 @@ public class Parser
         {
             Token op = advance();
             Expression right = unary();
-            expr = new Expression.Binary(expr, op, right);
+            expr = new Binary(expr, op, right);
         }
         return expr;
     }
@@ -249,7 +250,7 @@ public class Parser
         {
             Token op = advance();
             Expression right = unary();
-            return new Expression.Unary(op, right);
+            return new Unary(op, right);
         }
         return primary();
     }
@@ -258,12 +259,12 @@ public class Parser
     {
         if (check(TokenType.IDENTIFIER)) 
         {
-            return new Expression.Variable(advance());
+            return new Variable(advance());
         }
 
         if (check(TokenType.NUMBER, TokenType.STRING, TokenType.TRUE, TokenType.FALSE))
         {
-            return new Expression.Literal(advance());
+            return new Literal(advance());
         }
 
         consume(TokenType.LEFT_PAREN, "Expected expression.");
