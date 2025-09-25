@@ -13,7 +13,7 @@ import spl.scanner.*;
  * scanning it, and printing the resulting tokens.
  * 
  * @author Jan Ryszkiewicz
- * @version 1.0
+ * @version 0.3
  * 
  */
 public class Spl 

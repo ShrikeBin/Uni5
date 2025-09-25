@@ -15,5 +15,5 @@ all:
 clean:
 	rm -rf $(BIN_DIR)
 
-run: all
+run:
 	java -cp $(CLASS_PATH) spl.Spl $(ARGS)

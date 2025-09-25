@@ -50,7 +50,7 @@ public enum TokenType
 	FOR,
 	WHILE,
 	RETURN,
-	FUNCTION,
+	FUNCTION_DEC,
 	VAR,
 	PRINT,
 	TRUE,

@@ -22,22 +22,22 @@ public class Parser
 
     public List<Declaration> parse() 
     {
-        List<Declaration> statements = new ArrayList<>();
+        List<Declaration> program = new ArrayList<>();
         while (!isAtEnd()) 
         {
             Declaration decl = declaration();
-            if (decl != null) statements.add(decl);
+            if (decl != null) program.add(decl);
         }
-        return statements;
+        return program;
     }
 
     private Declaration declaration() 
     {
         try 
         {
-            if (match(TokenType.VAR))
+            if (match(TokenType.FUNCTION_DEC))
             {
-                return varDeclaration();
+                return funDeclaration();
             }
 
             return statement();
@@ -47,6 +47,25 @@ public class Parser
             synchronize();
             return null;
         }
+    }
+
+    private Declaration funDeclaration()
+    {
+        Token name = consume(TokenType.IDENTIFIER, "Expected function name.");
+        consume(TokenType.LEFT_PAREN, "Expected ( after function declaration.");
+        List<Token> params = new ArrayList<>();
+        while(!match(TokenType.RIGHT_PAREN))
+        {
+            Token var = consume(TokenType.IDENTIFIER, "Expected variable in function parameters.");
+            params += var;
+            if(peek(TokenType.RIGHT_PAREN))
+            {
+                break;
+            }
+            consume(TokenType.COMMA, "Expected , between parameters");
+        }
+        
+        return new FunDecl(name, params, null, null);
     }
 
     private Declaration varDeclaration() throws ParseError 

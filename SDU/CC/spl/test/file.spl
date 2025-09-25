@@ -1,42 +1,6 @@
 // SPL test program
 
-fun add(a, b) {
+func add(a, b) {
     var result = a + b;
     return result;
 }
-
-var x = 42;
-var y = 13;
-
-if (x > y) {
-    print("x is greater!");
-} else if (x == y) {
-    print("x equals y");
-} else {
-    print("y is greater!");
-}
-
-// logical operators
-var flag = true && false || !false;
-
-// increment/decrement
-x++;
-y--;
-
-// math operators
-var z = x * y / 2 % 3;
-var powTest = x ** 2;
-
-/*
-    the king is dead
-
-    LONG LIVE THE king
-*/
-
-var kur_wi_ca = 3.
-
-if (kur_wi_ca == 10)
-{
-    foo();
-}
-

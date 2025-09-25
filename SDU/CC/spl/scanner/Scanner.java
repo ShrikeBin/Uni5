@@ -26,7 +26,7 @@ public class Scanner
 		keywords.put("for",   TokenType.FOR);
 		keywords.put("while", TokenType.WHILE);
 		keywords.put("return", TokenType.RETURN);
-		keywords.put("func", TokenType.FUNCTION);
+		keywords.put("func", TokenType.FUNCTION_DEC);
 		keywords.put("var",   TokenType.VAR);
 		keywords.put("print", TokenType.PRINT);
 		keywords.put("true",  TokenType.TRUE);
