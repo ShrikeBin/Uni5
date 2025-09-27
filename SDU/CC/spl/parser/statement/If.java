@@ -4,7 +4,7 @@ import spl.parser.*;
 import spl.scanner.Token;
 
 public final class If extends Statement
-    {
+{
     public final Expression condition; 
     public final Statement thenBranch; 
     public final Statement elseBranch;
