@@ -1,0 +1,16 @@
+---
+title: Exc 5
+---
+
+# 5.1
+```{r}
+library(faraway)
+data(corrosion)
+plot(corrosion)
+```
+
+# 5.2
+
+```{r}
+
+```

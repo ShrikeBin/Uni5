@@ -1,0 +1,46 @@
+---
+title: Exc sheet 6
+---
+
+# 6.1
+
+```{r}
+library(faraway)
+data(savings)
+plot(savings)
+
+df <- savings
+
+fit = lm(sr ~ pop15 + pop75 + dpi + ddpi, data = savings)
+
+summary(fit)
+```
+
+# 6.2
+
+```{r}
+# Hand made F - test
+X = model.matrix(fit)
+Y = df$sr  # pulls response from memory
+n = nrow(X)
+p = ncol(X)
+
+Y_hat = X %*% solve(t(X) %*% X) %*% t(X) %*% Y
+RSS = sum((Y - Y_hat)^2)
+SS_reg = sum((Y_hat - mean(Y))^2)
+F_test = (SS_reg / (p-1)) / (RSS / (n-p))
+print(F_test)
+
+# F distribution check that P(F_dstr >= F_Test)
+pf(F_test, p-1, n-p, lower.tail = FALSE)
+```
+
+# 6.3
+
+```{r}
+# B_1 = 0 is fine it might not sound precise but it's literally equal to F test so "WORDING" I guess
+M_0 = lm(sr ~ pop75 + dpi + ddpi, data = savings)
+M_1 = lm(sr ~ pop15 + pop75 + dpi + ddpi, data = savings)
+
+# DO HANDMADE ANOVA
+```
