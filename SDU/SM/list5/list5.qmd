@@ -6,11 +6,67 @@ title: Exc 5
 ```{r}
 library(faraway)
 data(corrosion)
-plot(corrosion)
+df <- corrosion
+fit = lm(loss ~ ., data = corrosion)
+summary(fit)
+
+# make a fake X being intercept + 1.5 Fe
+c = c(1, 1.5)
+beta_hat = coefficients(fit)
+psi_hat <- c %*% beta_hat
+
+# using built-in
+predict(fit, data.frame(Fe = 1.5))
+
+# Confidence interval
+
+# psi_hat = c^t * B_hat
+# psi_hat - psi / SE_hat_psi ~ t distributed n-p 
+# Confidence interval is psi_hat +- SE_hat_psi * t n-p, 1-alpha
+Y = df$loss
+X <- model.matrix(fit)  # design matrix
+n <- nrow(X)
+p <- ncol(X)
+Y_hat <- X %*% solve(t(X) %*% X) %*% t(X) %*% Y
+RSS <- sum((Y - Y_hat)^2)
+sigma2_hat <- RSS / (n - p)
+SE_psi_hat <- sqrt(sigma2_hat * t(c) %*% solve(t(X) %*% X) %*% c)
+alpha <- 0.05
+t_val <- qt(1 - alpha/2, df = n - p)
+CI_lower <- psi_hat - t_val * SE_psi_hat
+CI_upper <- psi_hat + t_val * SE_psi_hat
+
+# for alpha = 0.05 confidence interval is
+# (1-alpha) * 100% times when we try it will be in that interval
+c(L = CI_lower, U = CI_upper)
+
+# Built in
+predict(fit, data.frame(Fe = 1.5), interval = "confidence", level = 0.95)
+
+# Now test that loss = 95% for Fe = 1.5%
+alpha = 0.05
+t = (psi_hat - 95) / SE_psi_hat
+p = p <- 2 * pt(-abs(t), n-p)
+print(p)
+# P() = 0.31  > alpha -> we cant reject that loss is 95%
+
+# one sided (for >= 95%)
+print(p/2)
+# P() even lower -> we still dont reject
+
+# using car
+library(car)
+linearHypothesis(fit, c, 95)
+# the same
+
 ```
 
 # 5.2
 
 ```{r}
-
+# Use R and repeated simulations from a linear model of your choice, to check (graph-
+# ically) that SSreg/(p − 1) and RSS/(n − p) are χ2-distributed and independent, and
+# check that their ratio is F -distributed under the null-model.
+# The corresponding sums of squares can be calculated directly or obtained from e.g.
+# the anova-function in R using e.g. anova(fit0, fit1)$RSS.
 ```

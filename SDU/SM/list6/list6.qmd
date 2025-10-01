@@ -11,16 +11,16 @@ plot(savings)
 
 df <- savings
 
-fit = lm(sr ~ pop15 + pop75 + dpi + ddpi, data = savings)
+M_1 = lm(sr ~ pop15 + pop75 + dpi + ddpi, data = savings)
 
-summary(fit)
+summary(M_1)
 ```
 
 # 6.2
 
 ```{r}
 # Hand made F - test
-X = model.matrix(fit)
+X = model.matrix(M_1)
 Y = df$sr  # pulls response from memory
 n = nrow(X)
 p = ncol(X)
@@ -40,7 +40,77 @@ pf(F_test, p-1, n-p, lower.tail = FALSE)
 ```{r}
 # B_1 = 0 is fine it might not sound precise but it's literally equal to F test so "WORDING" I guess
 M_0 = lm(sr ~ pop75 + dpi + ddpi, data = savings)
-M_1 = lm(sr ~ pop15 + pop75 + dpi + ddpi, data = savings)
+M_alt = M_1
 
-# DO HANDMADE ANOVA
+pop15 = coef(M_alt)[2]
+sigma_hat = sqrt(RSS / (n-p))
+X = model.matrix(M_alt)
+
+# here we check if B_hat corresponding to pop15 = 0
+# solve(..) is cᵗ(XᵗX)⁻¹c
+t = (pop15 - 0) / (sigma_hat * sqrt(solve(t(X)%*%X)[2,2]))
+
+#concatenates and prints t and tˆ2
+c(t = t, "t^2" = (t^2))
+
+# print values P( > ) for T distribution
+pt(-abs(t), n-p) + pt(abs(t), n-p, lower.tail = FALSE)
+
+# compare to anova()
+anova(M_0, M_alt)
+
+# Probablity that we get to as extreme case assuming M_0 is true is ~0.0026 therefore we reject.
+```
+
+# 6.4
+
+```{r}
+M_0 = lm(sr ~ pop15 + dpi, data = savings)
+M_alt = M_1
+
+# compare models
+anova(M_0, M_alt)
+# P(>F) is chance that the improvement of this scale is likely
+# Here P(>F) = 0.0489 therefore I cant really say anything, for alpha = 0.05 we reject
+# therefore M_alt explains better
+```
+
+# 6.5
+
+```{r}
+M_1 <- lm(sr ~ ., data = savings)
+M_0 <- lm(sr ~ I(pop15 + pop75) + dpi + ddpi, data = savings)
+anova(M_0, M_1)
+# P( >F) here tells use what is the probability of such improvement when treating pop15 and pop75 togheter
+# for alpha = 0.05 we cannot reject as the P( >F) is 0.215 -> we should differentiate pop15 and pop75
+```
+
+# 6.6
+
+```{r}
+fit_1 <- lm(sr ~ ., data = savings)
+fit_0 <- lm(sr ~ pop15 + pop75 + dpi+ offset(0.5*ddpi), data = savings)
+anova(fit_0, fit_1)
+# P(>F) = 0.65, we cannot reject, fit_0 just as good as fit_1
+
+# Now manually
+M_1 = fit_1
+
+ddpi = coef(M_1)[5]
+sigma_hat = sqrt(RSS / (n-p))
+X = model.matrix(M_1)
+
+t = (ddpi - 0.5) / (sigma_hat * sqrt(solve(t(X)%*%X)[5,5]))
+
+pt(-abs(t), n-p) + pt(abs(t), n-p, lower.tail = FALSE)
+
+# therefore we cannot reject
+
+# it can also be done taking things out of the summary
+S <- summary(fit_1)
+estm <- S$coefficients[5,1] # 4th + intercept
+target <- 0.5
+sigma <- S$coefficients[5,2] # Std.Err.
+t <- (estm - target) / sigma
+pt(-abs(t), 45) + pt(abs(t), 45, lower.tail = FALSE)
 ```
