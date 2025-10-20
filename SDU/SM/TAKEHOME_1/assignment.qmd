@@ -8,7 +8,7 @@ format: pdf
 
 ### subtask 1
 
-Let's perform basic inspection:
+We perform basic inspection:
 
 ```{r}
 load("Data ST523 813 E2025 Exam.rdata")
@@ -19,7 +19,7 @@ ncol(df)
 summary(df)
 ```
 
-Then try fitting a default model:
+We fit a default model:
 
 ```{r}
 model = lm(CO ~ AT + AP + AH + GTEP + TIT + TAT + CDP + TEY, data = df)
@@ -27,12 +27,18 @@ model = lm(CO ~ AT + AP + AH + GTEP + TIT + TAT + CDP + TEY, data = df)
 
 ### subtask 2
 
-Then show the parameters as well as the change in CO when Ambient Temperature (AT) increases by 1 degree C:
+Display all the estimated parameters:
 
 ```{r}
 coef(model)
+```
+
+And the one for ambient temperature in particular:
+```{r}
 coef(model)["AT"]
 ```
+
+From this we know that the estimated change in CO for a 1°C increase in ambient temperature, other predictors constant, is -0.0216 units.
 
 ### subtask 3
 
@@ -82,20 +88,20 @@ Therefore we conclude that we *can reduce* the default model to the Process Only
 
 ### subtask 5
 
-First I would like to try and find even better fit:
+First should we examine our current fit:
 
 ```{r}
 anova(M_B)
 ```
 
-By playing around with **anova**'s chain of hypotesis testing indicates the possibility fitting an alternative model, as including TEY as predictor appears unnecessary:
+We notice that **Anova**'s chain of hypotesis testing table indicates the possibility fitting an alternative model, as including TEY as predictor appears unnecessary:
 
 ```{r}
 M_Alt = lm(CO ~ GTEP + TIT + TAT + CDP, data = df)
 anova(M_Alt, M_B)
 ```
 
-Here, in the F test we can see that p value isnt lower that $\alpha = 0.05$ therefore reducing the number of variables again doesnt seem to worsen the model - we can use the alternative one from now on.
+Here, in the F test we can see that p value is not lower than $\alpha = 0.05$ therefore reducing the number of variables again doesnt seem to worsen the model - we can use the alternative one from now on.
 
 By inspecting adjusted $R^2$ between models we can see that the jump between our alternative model and the one proposed in the last subtask is not that significant.
 
