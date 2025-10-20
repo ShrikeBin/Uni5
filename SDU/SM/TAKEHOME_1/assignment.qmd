@@ -6,9 +6,143 @@ format: pdf
 
 # Task 1
 
+### subtask 1
+
+Let's perform basic inspection:
+
 ```{r}
+load("Data ST523 813 E2025 Exam.rdata")
+df <- Data
+pairs(df)
+nrow(df)
+ncol(df)
+summary(df)
+```
+
+Then try fitting a default model:
+
+```{r}
+model = lm(CO ~ AT + AP + AH + GTEP + TIT + TAT + CDP + TEY, data = df)
+```
+
+### subtask 2
+
+Then show the parameters as well as the change in CO when Ambient Temperature (AT) increases by 1 degree C:
+
+```{r}
+coef(model)
+coef(model)["AT"]
+```
+
+### subtask 3
+
+Perform F-Test:
+
+```{r}
+summary(model)
+```
+
+As we can see:
+
+`F-statistic: 102.8 on 8 and 291 DF,  p-value: < 2.2e-16`
+
+P-value is very low which indicates the rejection of $H_0$ - global null hypotesis at significance $\alpha = 0.05$
+
+We have 291 residual degrees of freedom (n - p) and 8 model degrees of freedom (p - 1)
+
+Value of the F-test statistic is 102.8
+
+### subtask 4
+
+Let's start by fitting 2 submodels:
+```{r}
+M_A = lm(CO ~ AT + AP + AH, data = df)
+M_B = lm(CO ~ GTEP + TIT + TAT + CDP + TEY, data = df)
+```
+
+Now try comparing ambient only model to the default:
+
+```{r}
+anova(M_A, model)
+```
+
+As we can see by the corresponding F-statistic ( 146.4 ) and p-value ( < 2.2e-16)
+The default model explains the data *much better*
+
+What about the process only model?:
+
+```{r}
+anova(M_B, model)
+```
+
+Here we can see, that rejection of the null hypotesis being that default model explains the data better is not possible, as the corresponding F statistic (~ 1.76) and p-value ( 0.15 ) suggest the redundancy of ambient variables in the fitting
+i. e. adding *AT + AP + AH* predictors to Process Only fit does **not** significantly improve the model.
+
+Therefore we conclude that we *can reduce* the default model to the Process Only one as it does not significantly worsen the model.
+
+### subtask 5
+
+First I would like to try and find even better fit:
+
+```{r}
+anova(M_B)
+```
+
+By playing around with **anova**'s chain of hypotesis testing indicates the possibility fitting an alternative model, as including TEY as predictor appears unnecessary:
+
+```{r}
+M_Alt = lm(CO ~ GTEP + TIT + TAT + CDP, data = df)
+anova(M_Alt, M_B)
+```
+
+Here, in the F test we can see that p value isnt lower that $\alpha = 0.05$ therefore reducing the number of variables again doesnt seem to worsen the model - we can use the alternative one from now on.
+
+By inspecting adjusted $R^2$ between models we can see that the jump between our alternative model and the one proposed in the last subtask is not that significant.
+
+```{r}
+R_Ambient = summary(M_A)$adj.r.squared
+R_Alt = summary(M_Alt)$adj.r.squared
+R_Process = summary(M_B)$adj.r.squared
+R_default = summary(model)$adj.r.squared
+
+R_Ambient
+
+R_Alt
+
+R_Process
+
+R_default
 
 ```
+
+The final inspection of variation let's choose Process Only model M_B:
+
+```{r}
+explained_variation = summary(M_B)$r.squared
+CO = df$CO
+TSS = sum((CO - mean(CO))^2)
+RSS = sum(residuals(M_B)^2)
+absolute_reduction = TSS - RSS
+
+explained_variation
+
+absolute_reduction
+```
+
+It is worth performing similar inspection for the alternate model M_Alt:
+
+```{r}
+explained_variation = summary(M_Alt)$r.squared
+RSS = sum(residuals(M_Alt)^2)
+absolute_reduction = TSS - RSS
+
+explained_variation
+
+absolute_reduction
+```
+
+The absolute reduction in the residual sum of squares is only slightly higher for model M_B, at the cost of including one additional predictor. Depending on the available computational power, we can choose to either stay by M_B for marginally better performance or opt for the slightly lighter M_Alt, which performs almost equivalently.
+
 
 # Task 2
 ### subtask 1
@@ -118,7 +252,7 @@ That concludes the first subtask of Task 2.
 Next we want to look for statistical evidence for:
 $\alpha_2  \le \alpha_3$
 
-Therefore we perform One Sided Hyphotesis Test on:
+Therefore we perform One Sided hypotesis Test on:
 
 $$
 \begin{aligned}
