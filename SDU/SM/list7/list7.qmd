@@ -1,0 +1,79 @@
+---
+title: Exc sheet 7
+---
+
+# 7.1
+
+```{r}
+df1 = read.csv("list7/Systolic.csv", header=TRUE)
+df1$drug = as.factor(df1$drug)
+df1$disease = as.factor(df1$disease)
+
+# first-category-baseline
+fit1 = lm(systolic~drug, data=df1)
+
+# sum-to-zero-contrast
+fit2 = lm(systolic~drug, data=df1, contrasts = list(drug=contr.sum))
+
+
+# first-category-baseline
+summary(fit1)
+
+# sum-to-zero-contrast
+summary(fit2)
+
+
+# as we can see data is imbalanced
+tbl = table(df1$disease, df1$drug)
+tbl
+
+
+# Let's do ANOVA
+M_0 = lm(systolic ~ 1, data=df1)
+M_1 = lm(systolic ~ drug, data=df1)
+
+anova(M_0, M_1)
+
+```
+
+# 7.2
+
+```{r}
+df1 = read.csv("list7/Systolic.csv", header=TRUE)
+df1$drug = as.factor(df1$drug)
+df1$disease = as.factor(df1$disease)
+
+# first, make some plots
+
+# take it from preapred code xd
+# plot1 <- ggplot(df1, aes(x = as.numeric(drug), y = systolic, color = disease)) ....
+# plot2 <- ggplot()
+
+fit1 = lm(systolic ~ drug + disease, data=df1)
+fit2 = lm(systolic ~ drug * disease, data=df1)
+
+anova(fit1, fit2)
+
+# as we can see here, drug "does all the work"
+anova(fit2)
+
+
+# Let us view the means
+lm(formula = systolic ~ drug:disease-1, data=df1)
+
+
+# Tukey
+TukeyHSD(aov(systolic ~ drug*disease, data=df1), conf.level = 0.95)
+```
+
+# 7.3
+
+```{r}
+# we dont have the data lmao
+```
+
+# 7.4
+
+```{r}
+# need ggplot
+```
