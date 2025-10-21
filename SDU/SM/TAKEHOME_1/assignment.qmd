@@ -63,7 +63,7 @@ Value of the F-test statistic is 102.8
 Let's start by fitting 2 submodels:
 ```{r}
 M_A = lm(CO ~ AT + AP + AH, data = df)
-M_B = lm(CO ~ GTEP + TIT + TAT + CDP + TEY, data = df)
+M_B = lm(CO ~ GTEP + TIT + TAT + TEY, data = df)
 ```
 
 Now try comparing ambient only model to the default:
@@ -73,7 +73,12 @@ anova(M_A, model)
 ```
 
 As we can see by the corresponding F-statistic ( 146.4 ) and p-value ( < 2.2e-16)
-The default model explains the data *much better*
+The default model explains the data *much better* i.e.
+$$
+\exists{_{i\ne AT, AP, AH}} \text{ such that } \beta_i \ne 0 
+$$
+So we reject the $H_0$ that all other predictiors aside from *AT,AP,AH* are $= 0$.
+
 
 What about the process only model?:
 
@@ -81,39 +86,23 @@ What about the process only model?:
 anova(M_B, model)
 ```
 
-Here we can see, that rejection of the null hypotesis being that default model explains the data better is not possible, as the corresponding F statistic (~ 1.76) and p-value ( 0.15 ) suggest the redundancy of ambient variables in the fitting
-i. e. adding *AT + AP + AH* predictors to Process Only fit does **not** significantly improve the model.
+The rejection of the null hypothesis—that the reduced (process-only) model explains the data equally well—is supported by the F statistic (~2.58) and the corresponding p-value (0.037). This suggests that, at a significance level of $\alpha = 0.05$, adding other predictors leads to a statistically significant improvement in model fit. However, for $\alpha = 0.01$, the evidence would not be strong enough to reject the null hypothesis.
 
-Therefore we conclude that we *can reduce* the default model to the Process Only one as it does not significantly worsen the model.
+Therefore we conclude that we *can reduce* the default model to the Process Only, however only when accepting our significance
+level to be $< 0.04$
 
 ### subtask 5
 
-First should we examine our current fit:
+From the last subtask we can conclude that M_B is better than M_A therefore M_B is chosen as our final model for this subtask.
 
-```{r}
-anova(M_B)
-```
-
-We notice that **Anova**'s chain of hypotesis testing table indicates the possibility fitting an alternative model, as including TEY as predictor appears unnecessary:
-
-```{r}
-M_Alt = lm(CO ~ GTEP + TIT + TAT + CDP, data = df)
-anova(M_Alt, M_B)
-```
-
-Here, in the F test we can see that p value is not lower than $\alpha = 0.05$ therefore reducing the number of variables again doesnt seem to worsen the model - we can use the alternative one from now on.
-
-By inspecting adjusted $R^2$ between models we can see that the jump between our alternative model and the one proposed in the last subtask is not that significant.
+By inspecting adjusted $R^2$ between models we can see the diffrence of total adjusted explained variation between models.
 
 ```{r}
 R_Ambient = summary(M_A)$adj.r.squared
-R_Alt = summary(M_Alt)$adj.r.squared
 R_Process = summary(M_B)$adj.r.squared
 R_default = summary(model)$adj.r.squared
 
 R_Ambient
-
-R_Alt
 
 R_Process
 
@@ -121,33 +110,53 @@ R_default
 
 ```
 
-The final inspection of variation let's choose Process Only model M_B:
+The absolute reduction of unexplained variation for Process Only model M_B:
 
 ```{r}
-explained_variation = summary(M_B)$r.squared
+explained_variation_Model_B = summary(M_B)$r.squared
 CO = df$CO
 TSS = sum((CO - mean(CO))^2)
 RSS = sum(residuals(M_B)^2)
-absolute_reduction = TSS - RSS
+absolute_reduction_Model_B = TSS - RSS
 
-explained_variation
+explained_variation_Model_B
 
-absolute_reduction
+absolute_reduction_Model_B 
 ```
 
-It is worth performing similar inspection for the alternate model M_Alt:
+Let us introduce another alternative model M_Alt that includes CDP as one of its predictors:
 
 ```{r}
-explained_variation = summary(M_Alt)$r.squared
-RSS = sum(residuals(M_Alt)^2)
-absolute_reduction = TSS - RSS
+M_Alt = lm(CO ~ GTEP + TIT + TAT + CDP + TEY, data = df)
 
-explained_variation
-
-absolute_reduction
+anova(M_Alt,M_B)
 ```
 
-The absolute reduction in the residual sum of squares is only slightly higher for model M_B, at the cost of including one additional predictor. Depending on the available computational power, we can choose to either stay by M_B for marginally better performance or opt for the slightly lighter M_Alt, which performs almost equivalently.
+Analyzing this anova table we can conclude that the alternative model is better as the perforemd partial F test returned low p'value
+
+However we could further reduce the M_Alt:
+
+```{r}
+anova(M_Alt)
+```
+
+Here we see that the F test corresponding to the inclusion of TEY predictor shows a relatively high p'value that might indicate corresonding $\beta_{TEY} \approx 0$
+
+It is worth performing $R^2$ inspection for the alternate model M_Alt that includes CDP predictor and removes TEY as it seemed redundant:
+
+```{r}
+M_Alt = lm(CO ~ GTEP + TIT + TAT + CDP, data = df)
+
+explained_variation_ModelAlt = summary(M_Alt)$r.squared
+RSS = sum(residuals(M_Alt)^2)
+absolute_reduction_ModelAlt = TSS - RSS
+
+explained_variation_ModelAlt
+
+absolute_reduction_ModelAlt
+```
+
+The absolute reduction in the residual sum of squares is only slightly higher for model M_Alt, at the cost of including one additional predictor *(CDP)*, and removing one other *(TEY)*. Depending on our circumstances, we can choose to either stay by *M_Alt* for marginally better performance or opt for the different *M_B*, which performs almost equivalently.
 
 
 # Task 2
