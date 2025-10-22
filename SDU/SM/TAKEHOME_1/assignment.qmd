@@ -2,6 +2,8 @@
 title: "Take Home Assignment 1"
 author: "Jan Ryszkiewicz"
 format: pdf
+mainfont: Latin Modern Roman
+sansfont: Latin Modern Roman
 ---
 
 # Task 1
@@ -163,21 +165,27 @@ The absolute reduction in the residual sum of squares is only slightly higher fo
 ### subtask 1
 The model presented in task can also be written as:
 $$
-X =
+\quad
+Y =
 \begin{bmatrix}
-1 & 0 & 0 & 0 & X_1 \\
-1 & 0 & 0 & 0 & X_2 \\
-\vdots & \vdots & \vdots & \vdots & \vdots \\
-1 & 1 & 0 & 0 & X_{_2} \\
-\vdots & \vdots & \vdots & \vdots & \vdots \\
-1 & 0 & 1 & 0 & X_{_3} \\
-\vdots & \vdots & \vdots & \vdots & \vdots \\
-1 & 0 & 0 & 1 & X_{_4} \\
-\vdots & \vdots & \vdots & \vdots & \vdots \\
-1 & 0 & 0 & 0 & X_{45}
+Y_1 \\
+Y_2 \\
+\vdots \\
+Y_{45}
 \end{bmatrix},
 \quad
-\beta =
+X =
+\begin{bmatrix}
+1 & \mathbb{1}_{2,1} & \mathbb{1}_{3,1} & \mathbb{1}_{4,1} & X_1 \\
+1 & \mathbb{1}_{2,2} & \mathbb{1}_{3,2} & \mathbb{1}_{4,2} & X_2 \\
+\vdots & \vdots & \vdots & \vdots & \vdots \\
+\vdots & \vdots & \vdots & \vdots & \vdots \\
+\vdots & \vdots & \vdots & \vdots & \vdots \\
+\vdots & \vdots & \vdots & \vdots & \vdots \\
+1 & \mathbb{1}_{2,45} & \mathbb{1}_{3,45} & \mathbb{1}_{4,45} & X_45 \\
+\end{bmatrix},
+\quad
+\beta^T =
 \begin{bmatrix}
 \mu \\
 \alpha_2 \\
@@ -186,16 +194,24 @@ X =
 b
 \end{bmatrix},
 \quad
-Y =
+\epsilon =
 \begin{bmatrix}
-Y_1 \\
-Y_2 \\
+\epsilon_1 \\
+\epsilon_2 \\
 \vdots \\
-Y_{45}
+\epsilon_{45}
 \end{bmatrix}.
 $$
-Where each column $2,3,4$ in $X$ is filled with $0, 1$ depending on corresponding $\alpha_{i(j)}$
-And column $1$ corresponds to always present $\mu$
+
+$$
+\mathbb{1}_{i,j} =
+\begin{cases}
+1 & \text{if } \alpha_j \text{ present in sample } i \\
+0 & \text{otherwise}
+\end{cases}
+$$
+
+Where column $1$ of $X$ corresponds to always present $\mu$ and each column $2,3,4$ is filled with $0, 1$ depending on corresponding $\alpha_{j(i)}$ (indicator function)
 
 Also $\alpha_i$ defined as:
 \begin{align*}
