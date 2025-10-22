@@ -12,7 +12,7 @@ sansfont: Latin Modern Roman
 
 We perform basic inspection:
 
-```{r}
+```{r, fig.width=18, fig.height=18}
 load("Data ST523 813 E2025 Exam.rdata")
 df <- Data
 pairs(df)
