@@ -185,7 +185,7 @@ X =
 1 & \mathbb{1}_{2,45} & \mathbb{1}_{3,45} & \mathbb{1}_{4,45} & X_45 \\
 \end{bmatrix},
 \quad
-\beta^T =
+\beta =
 \begin{bmatrix}
 \mu \\
 \alpha_2 \\
