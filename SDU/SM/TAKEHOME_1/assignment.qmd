@@ -126,6 +126,8 @@ explained_variation_Model_B
 absolute_reduction_Model_B 
 ```
 
+This basically concludes *Task 1* but I wanted to explore a certain idea with the presented models.
+
 Let us introduce another alternative model M_Alt that includes CDP as one of its predictors:
 
 ```{r}
@@ -248,8 +250,8 @@ $$
 \begin{aligned}
 c &= [0, 1, -1, 0, 0], \\
 \hat{\psi} &= c^T\hat{\beta} = \hat{\alpha}_2 - \hat{\alpha}_3, \\
-\hat{\text{SE}}(\hat{\psi}) &= \sqrt{cVar(\hat{\beta})c^T},\\
-&=\sqrt{Var(\hat{\alpha}_2 - \hat{\alpha}_3)}\\
+\hat{\text{SE}}(\hat{\psi}) &=\sqrt{Var(\hat{\alpha}_2 - \hat{\alpha}_3)}\\
+&= \sqrt{cVar(\hat{\beta})c^T},\\
 &= \sqrt{Var(\hat{\alpha}_2) + Var(\hat{\alpha}_3) - 2Cov(\hat{\alpha}_2, \hat{\alpha}_3)}, \\
 \text{CI}_{90\%} &= \hat{\psi} \pm t_{45-5,\, 1-0.10/2} \cdot \hat{\text{SE}}(\hat{\psi})
 \end{aligned}
@@ -302,8 +304,8 @@ $$
 \begin{aligned}
 \hat{\psi} &= \hat{\alpha}_2 - \hat{\alpha}_3 \\
 T &= \frac{(\hat{\alpha}_2 - \hat{\alpha}_3) - 0}{\hat{\text{SE}}(\hat{\psi})}\\
-&= \frac{-30{,}000}{32{,}573}\\
-&\approx -0.921
+&= \text{ }\frac{-30{,}000}{32{,}573}\\
+&\approx \text{ }-0.921
 \end{aligned}
 $$
 
@@ -370,13 +372,13 @@ $$
 $$
 Which further reduces to:
 $$
-\text{Var}(\hat{\beta}_1) =
-\frac{\sigma^2}{ \sum_i x_i^2 - \frac{1}{n}(\sum_i x_i)^2} =
-\frac{\sigma^2}{ \sum_i x_i^2 - \frac{2}{n}(\sum_i x_i)^2 + \frac{1}{n}(\sum_i x_i)^2} = 
-$$
-$$
-= \frac{\sigma^2}{ \sum_i x_i^2 - 2\sum_i x_i \cdot \bar{x} + n\bar{x}^2} = 
-\frac{\sigma^2}{ \sum_i (x_i - \bar{x})^2 }
+\begin{aligned}
+\text{Var}(\hat{\beta}_1) 
+&=\frac{\sigma^2}{ \sum_i x_i^2 - \frac{1}{n}(\sum_i x_i)^2} \\
+&=\frac{\sigma^2}{ \sum_i x_i^2 - \frac{2}{n}(\sum_i x_i)^2 + \frac{1}{n}(\sum_i x_i)^2} \\
+&= \frac{\sigma^2}{ \sum_i x_i^2 - 2\sum_i x_i \cdot \bar{x} + n\bar{x}^2} \\
+&=\frac{\sigma^2}{ \sum_i (x_i - \bar{x})^2 }
+\end{aligned}
 $$
 We want to minimize the $\text{Var}(\hat{\beta}_1)$.
 Which can be done by maximizing $\sum_i (x_i - \bar{x})^2$ as $\sigma^2$ is constant.
