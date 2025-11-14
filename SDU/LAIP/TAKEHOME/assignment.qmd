@@ -308,7 +308,6 @@ $$
 \alpha_n \,(0 + b_n y_n - \sum_{j=1}^m a_{nj} x_{nj})\\
 \end{aligned}
 &
-||
 &
 \begin{aligned}
 \beta_1 \,(1 - \sum_{i=1}^n x_{i1}) \\
@@ -317,7 +316,6 @@ $$
 \beta_m \,(1 - \sum_{i=1}^n x_{im})\\
 \end{aligned}
 &
-||
 &
 \begin{aligned}
 \gamma_1 \,(1 - y_1) \\
@@ -331,9 +329,18 @@ $$
 Then we denote **PR** relaxed problem:
 
 $$
-\begin{matrix}
 \mathrm{PR}(\alpha, \beta, \gamma)
-= \min_{\text{by all } y, x \geq 0}
+= \mathrm{}\min\limits_{\text{by all } y, x \geq 0}
+\left\{
+\begin{aligned}
+\vdots \\
+\end{aligned}
+\right\} =
+$$
+
+$$
+\begin{matrix}
+=\min\limits_{\text{by all } y, x \geq 0}
 \left\{
 \begin{aligned}
 c_1 y_1 + \cdots + c_n y_n +\\
@@ -352,9 +359,9 @@ c_1 y_1 + \cdots + c_n y_n +\\
 \end{aligned}
 \right\}
 &
-\Rightarrow
+=
 &
-\min_{\text{by all } y, x \geq 0}
+\min\limits_{\text{by all } y, x \geq 0}
 \left\{
 \begin{aligned}
 y_1 \,(c_1 + \alpha_1 b - \gamma_1) +\\
@@ -372,11 +379,12 @@ x_{n,m} \,(0 - \alpha_n a_m -\beta_n) +\\
 \sum_{j=1}^m \beta_j +\\
 \sum_{i=1}^n \gamma_i +\\
 \end{aligned}
-\right\}.
+\right\}
 \end{matrix}
 $$
 
-To avoid useless lower bounds we set all $\geq 0$, so to get to the dual constraints:
+To avoid useless lower bounds we set all parts multiplied by $y,x$ $\geq 0$, (otherwise corresponding variable, for instance $x_{i,j} -> \infty$ and $\min\limits_{\text{by all } y, x \geq 0} = -\infty$) \newline 
+That's how we get to the dual constraints:
 $$
 \begin{matrix}
 \begin{aligned}
@@ -400,7 +408,7 @@ $$
 \,\alpha_1 b - \gamma_1 \geq -c_1\\
 \,\alpha_2 b - \gamma_2 \geq -c_2\\
 \vdots \\
-\,-\alpha_n b - \gamma_n \geq 0\\
+\,-\alpha_n b - \gamma_n \geq -c_n\\
 \,-\alpha_n a_1 -\beta_1 \geq 0\\
 \,-\alpha_2 a_1 -\beta_2 \geq 0\\
 \vdots \\
@@ -431,38 +439,32 @@ $$
 \operatorname{opt}(\mathrm{PR}(\alpha,\beta,\gamma)) \;\le\; \operatorname{opt}(P)
 $$
 
-We need to penalize breaking the constraints, i.e. each dual variable must be chosen so that **violating a original constraint increases the value of the objective**.
+We need to penalize breaking the constraints. \newline
+That will cause the found $\min\limits_{\text{by all } y, x \geq 0}$ to not break any constraint. \newline 
+We have to make it impossible to achieve minimum when breaking the constraint. \newline
+And to do that each dual variable must be chosen so that **violating a original constraint increases the value of the objective**.
 
-For the constraints of type $\alpha$:
-$\sum_{j=1}^m a_{ij} x_{ij} \le b_i y_i$
+For the constraints of type $\alpha \Rightarrow \sum_{j=1}^m a_{ij} x_{ij} \le b_i y_i$
 
 - The violation measure is  
   $b_i y_i - \sum_{j=1}^m a_{ij} x_{ij}.$
 - When **broken**, this becomes **negative**.
 - To penalize the objective it requires  
-  $$
-  \alpha_i \le 0.
-  $$
+  $\alpha_i \leq 0.$
 
-For the constraints of type $\gamma$: 
-$y_i \le 1$:
+For the constraints of type $\gamma \Rightarrow y_i \le 1$:
 
 - The violation measure is  
   $1 - y_i.$
 - When **breaking** this becomes **negative**.
 - To ensure the penalty, we need  
-  $$
-  \gamma_i \ge 0.
-  $$
+  $\gamma_i \leq 0.$
 
-For the constraints of type $\beta$ 
-$\sum_{i=1}^n x_{ij} = 1$:
+For the constraints of type $\beta \Rightarrow \sum_{i=1}^n x_{ij} = 1$:
 
 - Violations can happen **in both ways**.
 - Therefore we set:
-  $$
-  \beta_j \in \mathbb{R}.
-  $$
+  $\beta_j \in \mathbb{R}.$
 
 This ensures that always:
 $$
@@ -492,7 +494,10 @@ $$
 \,&\gamma_i \le 0. \quad i = 1,\ldots,n \quad\\
 \end{aligned}
 &
-\Rightarrow
+\begin{matrix}
+\Rightarrow\\
+\text{organized as}
+\end{matrix}
 &
 \begin{aligned}
 \max \;& \sum_{j=1}^m \beta_j + \sum_{i=1}^n \gamma_i  \\\\
@@ -768,7 +773,7 @@ Nodes were opened in alphabetical order (i.e. A $\rightarrow$ B $\rightarrow$ C 
 %Prunes
 \node[below=2mm of C, draw = none, font=\footnotesize, align=center] {$\textit{pruned by optimality}$};
 \node[below=2mm of E, draw = none, font=\footnotesize, align=center] {$\textit{pruned by infeasibility}$};
-\node[below=2mm of F, draw = none, font=\footnotesize, align=center] {$\textcolor{pruned by objective value}$};
+\node[below=2mm of F, draw = none, font=\footnotesize, align=center] {$\textit{pruned by objective value}$};
 \node[below=2mm of G, draw = none, font=\footnotesize, align=center] {$\textcolor{DarkGreen}{Optimal}$};
 
 \end{tikzpicture}
