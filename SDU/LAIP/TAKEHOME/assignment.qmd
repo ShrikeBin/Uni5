@@ -368,14 +368,14 @@ y_1 \,(c_1 + \alpha_1 b - \gamma_1) +\\
 y_2 \,(c_2 + \alpha_2 b - \gamma_2) +\\
 \vdots \\
 y_1 \,(c_n + \alpha_n b - \gamma_n) +\\
-x_{1,1} \,(0 - \alpha_n a_1 -\beta_1) +\\
-x_{2,1} \,(0 - \alpha_2 a_1 -\beta_2) +\\
+x_{11} \,(0 - \alpha_n a_1 -\beta_1) +\\
+x_{21} \,(0 - \alpha_2 a_1 -\beta_2) +\\
 \vdots \\
-x_{n,1} \,(0 - \alpha_n a_1 -\beta_n) +\\
-x_{1,2} \,(0 - \alpha_1 a_2 -\beta_1) +\\
-x_{2,2} \,(0 - \alpha_2 a_2 -\beta_2) +\\
+x_{n1} \,(0 - \alpha_n a_1 -\beta_n) +\\
+x_{12} \,(0 - \alpha_1 a_2 -\beta_1) +\\
+x_{22} \,(0 - \alpha_2 a_2 -\beta_2) +\\
 \vdots \\
-x_{n,m} \,(0 - \alpha_n a_m -\beta_n) +\\
+x_{nm} \,(0 - \alpha_n a_m -\beta_n) +\\
 \sum_{j=1}^m \beta_j +\\
 \sum_{i=1}^n \gamma_i +\\
 \end{aligned}
@@ -658,7 +658,7 @@ Both of the solution $x_1, x_2$ fractional, we provide Gomory cuts for both:
 $$
 \begin{aligned}
 &\text{row }u = 1,2\\\\
-&\sum_{j \in N_{new}} \big(\bar{a}_{u,j} - \lfloor \bar{a}_{u,j} \rfloor \big) x_j 
+&\sum_{j \in N_{new}} \big(\bar{a}_{uj} - \lfloor \bar{a}_{uj} \rfloor \big) x_j 
 \;\ge\; \bar{b}_u - \lfloor \bar{b}_u \rfloor
 \end{aligned}
 $$
@@ -841,7 +841,7 @@ and $N \cdot d$ variables ($N$ words of lenght $d$) \newline
 We would like however to get rid of not explicitily linear absolute value in the constraints. We can do that by introductiong another variable that will replace it, let's call it $\gamma$:
 
 $$
-\gamma_{i,j,k} \approx | w_i[k] -w_j[k] |
+\gamma_{ijk} \Leftarrow | w_i[k] -w_j[k] |
 $$
 
 We have to bound it so that in all possible situations it is forced to hold a correct value:
@@ -849,10 +849,10 @@ We have to bound it so that in all possible situations it is forced to hold a co
 $$
 \begin{matrix}
 \begin{aligned}
-&\gamma_{i,j,k} \leq 2 - (w_i[k] +w_j[k])\\
-&\gamma_{i,j,k} \leq w_i[k] +w_j[k]\\
-&\gamma_{i,j,k} \geq w_i[k] -w_j[k]\\
-&\gamma_{i,j,k} \geq w_j[k] -w_i[k]  
+&\gamma_{ijk} \leq 2 - (w_i[k] +w_j[k])\\
+&\gamma_{ijk} \leq w_i[k] +w_j[k]\\
+&\gamma_{ijk} \geq w_i[k] -w_j[k]\\
+&\gamma_{ijk} \geq w_j[k] -w_i[k]  
 \end{aligned}
 \end{matrix}
 $$
@@ -863,43 +863,43 @@ $$
 \begin{matrix}
 \begin{aligned}
 & w_i[k] , w_j[k] = (0,0)\\\\
-&\gamma_{i,j,k} \leq 2\\
-&\gamma_{i,j,k} \leq 0\\
-&\gamma_{i,j,k} \geq 0\\
-&\gamma_{i,j,k} \geq 0\\
-&\Rightarrow \gamma_{i,j,k} = 0  
+&\gamma_{ijk} \leq 2\\
+&\gamma_{ijk} \leq 0\\
+&\gamma_{ijk} \geq 0\\
+&\gamma_{ijk} \geq 0\\
+&\Rightarrow \gamma_{ijk} = 0  
 \end{aligned}
 &
 \quad \quad\
 &
 \begin{aligned}
 & w_i[k] , w_j[k] = (1,1)\\\\
-&\gamma_{i,j,k} \leq 0\\
-&\gamma_{i,j,k} \leq 2\\
-&\gamma_{i,j,k} \geq 0\\
-&\gamma_{i,j,k} \geq 0 \\
-&\Rightarrow \gamma_{i,j,k} = 0   
+&\gamma_{ijk} \leq 0\\
+&\gamma_{ijk} \leq 2\\
+&\gamma_{ijk} \geq 0\\
+&\gamma_{ijk} \geq 0 \\
+&\Rightarrow \gamma_{ijk} = 0   
 \end{aligned}
 \\
 \\
 \begin{aligned}
 & w_i[k] , w_j[k] = (0,1)\\\\
-&\gamma_{i,j,k} \leq 1\\
-&\gamma_{i,j,k} \leq 1\\
-&\gamma_{i,j,k} \geq -1\\
-&\gamma_{i,j,k} \geq 1  \\
-&\Rightarrow \gamma_{i,j,k} = 1
+&\gamma_{ijk} \leq 1\\
+&\gamma_{ijk} \leq 1\\
+&\gamma_{ijk} \geq -1\\
+&\gamma_{ijk} \geq 1  \\
+&\Rightarrow \gamma_{ijk} = 1
 \end{aligned}
 &
 \quad \quad\
 &
 \begin{aligned}
 & w_i[k] , w_j[k] = (1,0)\\\\
-&\gamma_{i,j,k} \leq 1\\
-&\gamma_{i,j,k} \leq 1\\
-&\gamma_{i,j,k} \geq 1\\
-&\gamma_{i,j,k} \geq -1 \\
-&\Rightarrow \gamma_{i,j,k} = 1   
+&\gamma_{ijk} \leq 1\\
+&\gamma_{ijk} \leq 1\\
+&\gamma_{ijk} \geq 1\\
+&\gamma_{ijk} \geq -1 \\
+&\Rightarrow \gamma_{ijk} = 1   
 \end{aligned}
 \end{matrix}
 $$
@@ -909,24 +909,24 @@ Combinig that our new formulation looks as follows:
 $$
 \begin{aligned}
 &\max\limits_{} M_d \\
-&\left\{\sum_{k=1}^{d} \gamma_{i,j,k} \geq M_d \right\}\quad 1 \leq i < j \leq N \\
+&\left\{\sum_{k=1}^{d} \gamma_{ijk} \geq M_d \right\}\quad 1 \leq i < j \leq N \\
 &\left\{\begin{aligned}
-&\gamma_{i,j,k} \leq 2 - (w_i[k] +w_j[k])\\
-&\gamma_{i,j,k} \leq w_i[k] +w_j[k]\\
-&\gamma_{i,j,k} \geq w_i[k] -w_j[k]\\
-&\gamma_{i,j,k} \geq w_j[k] -w_i[k] \\
+&\gamma_{ijk} \leq 2 - (w_i[k] +w_j[k])\\
+&\gamma_{ijk} \leq w_i[k] +w_j[k]\\
+&\gamma_{ijk} \geq w_i[k] -w_j[k]\\
+&\gamma_{ijk} \geq w_j[k] -w_i[k] \\
 \end{aligned}\right\}
 \begin{aligned}
 &1 \leq i < j \leq N \\\\
 &1 \leq k \leq d
 \end{aligned}\\
-&\mathop{\forall}\limits_{j,k,i}\text{  } \gamma_{i,j,k} \in \mathbb{R}\\
+&\mathop{\forall}\limits_{j,k,i}\text{  } \gamma_{ijk} \in \mathbb{R}\\
 &\mathop{\forall}\limits_{j,k,i} \text{  } w_i[k], w_j[k] \in \left\{\mathbf{0},\mathbf{1}\right\}
 \end{aligned}
 $$
 
 That yields a total of ($\frac{N(N-1)}{2} + 4d\frac{N(N-1)}{2}$) constraints
-and ($N \cdot d + d\frac{N(N-1)}{2}$) variables ($w_i[k] + \gamma_{i,j,k}$) \newline
+and ($N \cdot d + d\frac{N(N-1)}{2}$) variables ($w_i[k] + \gamma_{ijk}$) \newline
 
 \clearpage\newpage
 
@@ -935,18 +935,18 @@ and ($N \cdot d + d\frac{N(N-1)}{2}$) variables ($w_i[k] + \gamma_{i,j,k}$) \new
 $$
 \begin{aligned}
 &\max\limits_{} M_d \\\\
-&\sum_{k=1}^{d} \gamma_{i,j,k} \geq M_d \quad \quad 1 \leq i < j \leq N \\
+&\sum_{k=1}^{d} \gamma_{ijk} \geq M_d \quad \quad 1 \leq i < j \leq N \\
 &\begin{aligned}
-&\gamma_{i,j,k} \leq 2 - (w_i[k] +w_j[k])\\
-&\gamma_{i,j,k} \leq w_i[k] +w_j[k]\\
-&\gamma_{i,j,k} \geq w_i[k] -w_j[k]\\
-&\gamma_{i,j,k} \geq w_j[k] -w_i[k] \\
+&\gamma_{ijk} \leq 2 - (w_i[k] +w_j[k])\\
+&\gamma_{ijk} \leq w_i[k] +w_j[k]\\
+&\gamma_{ijk} \geq w_i[k] -w_j[k]\\
+&\gamma_{ijk} \geq w_j[k] -w_i[k] \\
 \end{aligned}\quad
 \begin{aligned}
 &1 \leq i < j \leq N \\\\
 &1 \leq k \leq d
 \end{aligned}\\\\
-&\mathop{\forall}\limits_{j,k,i}\text{  } \gamma_{i,j,k} \in \mathbb{R}\\
+&\mathop{\forall}\limits_{j,k,i}\text{  } \gamma_{ijk} \in \mathbb{R}\\
 &\mathop{\forall}\limits_{j,k,i} \text{  } w_i[k], w_j[k] \in \left\{\mathbf{0},\mathbf{1}\right\}
 \end{aligned}
 $$
@@ -959,19 +959,289 @@ In the final formulation the problem belongs to the **Mixed Integer Lineary Prog
 # Task 8
 
 ## Subtask 8.a
+
+Let's first denote:
+
+- $j \in N$ = set of availible assets to invest in
+- $t \in T$ = set of all months where return data is given
+- $r_{jt}$ = variable denoting historical return on investment $j$ from month $t$ to month $t + 1$
+- $\epsilon$ = parameter determining minimum reward
+- $x_j$ = fraction of total money put into asset $j$
+
+Then our variables used in model will be:
+
+$$
+\begin{matrix}
+\begin{aligned}
+\hat{R_j} &= \frac{1}{T} \sum_{t=1}^T{r_{jt}}\\
+\hat{R} &= \sum_{j=1}^N{x_jR_{j}}\\
+\widehat{\text{MAD}} &= \frac{1}{T}\sum_{t=1}^T{\left[\sum_{j=1}^N{x_j(r_jt - \hat{R_j})}\right]} = \\
+&=\sum_{j=1}^N{x_j\left[\frac{1}{T}\sum_{t=1}^T{(r_jt - \hat{R_j})}\right]}
+\end{aligned}
+&
+\quad
+&
+\begin{aligned}
+c_j &= \frac{1}{T}\sum_{t=1}^T{(r_jt - \hat{R_j})}\\
+\alpha &= \max\Big( 0, \min_j \hat{R}_j \Big)\\
+\beta &= \max_j \hat{R}_j
+\end{aligned}
+\end{matrix}
+$$
+
+And the model is (assumed we *have to use all money*):
+
+$$
+\begin{aligned}
+& \max && \sum_{j=1}^{N} c_j x_j \\[2mm]
+& && \sum_{j=1}^{N} x_j \, \widehat{R}_j \ge \alpha + \epsilon (\beta - \alpha), \\[1mm]
+& && \sum_{j=1}^{N} x_j = 1, \\[1mm]
+& && x_j \ge 0, \quad j = 1,\dots,N
+\end{aligned}
+$$
+
+
 \clearpage\newpage
 
 ## Subtask 8.b
+
+Model:
+
+$$
+\begin{aligned}
+& \max && \sum_{j=1}^{N} c_j x_j \\[2mm]
+& && \sum_{j=1}^{N} x_j \, \widehat{R}_j \ge \alpha + \epsilon (\beta - \alpha), \\[1mm]
+& && \sum_{j=1}^{N} x_j = 1, \\[1mm]
+& && x_j \geq 0, \quad j = 1,\dots,N
+\end{aligned}
+$$
+
+Has exactly $N$ variables and $2$ (or $N+2$ if we include $x_j \geq 0$) constraints
 \clearpage\newpage
 
 ## Subtask 8.c 
+
+As gurobi was availible only with license I used **mip** solver that is free:
+
+```{python}
+#| eval: false
+from mip import Model, xsum, CONTINUOUS, MINIMIZE
+import matplotlib.pyplot as plt
+import sys
+import numpy as np
+
+class Data:
+    def __init__(self, filename):
+        with open(filename, "r") as filehandle:
+            lines=filehandle.readlines()
+        
+        self.N = int(lines[0].strip("\r\n"))
+        self.T = int(lines[1].strip("\r\n"))
+        self.r = np.zeros([self.N, self.T])
+
+        for line in lines[2:]:
+            line=line.strip("\r\n");
+            parts=line.split(" ");
+            j=int(parts[0])-1
+            t=int(parts[1])-1
+            val=float(parts[2])
+            self.r[j,t]=val
+
+        self.mean_r = np.mean(self.r, axis=1)
+        self.c = np.mean(self.r - self.mean_r[:, None], axis=1)
+        self.min_r = np.max([0, np.min(self.mean_r)])
+        self.max_r = np.max(self.mean_r)
+        
+        print("min_r:", self.min_r, "max_r:", self.max_r)
+
+
+def solve(data, epsilon):
+    m = Model("portfolio", sense=MINIMIZE)
+
+    # Threshold B
+    B = data.min_r + (epsilon/100)*(data.max_r - data.min_r)
+
+    N = data.N
+    R_hat = data.mean_r
+    c = data.c
+
+    # Variables x_j >= 0
+    x = [m.add_var(var_type=CONTINUOUS, lb=0) for j in range(N)]
+
+    # Objective function
+    m.objective = xsum(c[j]*x[j] for j in range(N))
+
+    # Constraint 1
+    m += xsum(R_hat[j]*x[j] for j in range(N)) >= B
+
+    # Constraint 2 (all money)
+    m += xsum(x[j] for j in range(N)) == 1
+
+    status = m.optimize()
+
+    x_values = [x[j].x for j in range(N)]
+     
+    if status == None:
+        return B, 0
+    return B, m.objective_value, x_values
+
+
+
+def main(argv):
+    if len(argv) != 1:
+        usage()
+    instance = Data(argv[0])
+    portfolio_info = []
+
+    epsilons = np.arange(0, 101, 10)
+    rewards = np.zeros_like(epsilons, dtype=np.float64)
+    risks = np.zeros_like(epsilons, dtype=np.float64)
+
+    for i, epsilon in enumerate(epsilons):
+        print(f"=== Solve for epsilon = {epsilon}")
+        B_val, obj_val, x_values = solve(instance, epsilon)
+
+        rewards[i] = B_val
+        risks[i] = obj_val
+
+        positive_x = [(j+1, x) for j, x in enumerate(x_values) if x > 0]
+
+        portfolio_info.append({
+            "epsilon": epsilon,
+            "reward": B_val,
+            "risk": obj_val,
+            "allocations": positive_x
+        })
+
+    plt.figure(figsize=(10,6))
+    plt.plot(rewards, risks, '-o')
+    plt.xlabel("Min Reward")
+    plt.ylabel("Associated Min Risk")
+    plt.title("Portfolio")
+    plt.grid(True)
+    
+    plt.figure(figsize=(6, 10))
+    plt.axis("off")
+    text_str = ""
+    for info in portfolio_info:
+        epsilon = info['epsilon']
+        positive_x = info['allocations']
+        alloc_str = ", ".join([f"x_{j} = {x:.4f}" for j, x in positive_x])
+        text_str += f"\nε = {epsilon}: \n{alloc_str}\n"
+
+    plt.text(0, 1, text_str, fontsize=12, va='top', ha='left', wrap=True)
+
+    plt.tight_layout()
+    plt.show()
+
+def usage():
+    print("Reads data from datafilename")
+    print("Usage: [\"datafilename\"]\n")
+    raise SystemExit
+
+
+if __name__ == "__main__":
+    main(sys.argv[1:])
+```
+
+| Risk/Reward plot |x's|
+|------------------|-----------------|
+| ![](reward.png){width=75%} | ![](x.png){width=25%} |
+
 \clearpage\newpage
 
 ## Subtask 8.d 
+
+
+Worst-period return objective:
+$$
+\max \min_{t=1,\dots,T} \sum_{j=1}^n x_j r_{jt}
+$$
+
+We can try to transform it:
+$$
+\begin{aligned}
+& \min \gamma \\
+&\min\limits_{t \in T}\left\{\sum_{j=1}^n x_j r_{jt}\right\} \le \gamma\\
+\end{aligned}
+$$
+
+Then this should work (because we need to make $\gamma$ only bigger than the smallest one)
+We make $\omega$ negative in the objective to penalize it being less than minimum across all $T$
+$$
+\begin{aligned}
+\min \text{ } &\gamma -\omega \\
+&\gamma \geq \omega \\
+&\omega \le \sum_{j=1}^n x_j r_{jt} \quad t=1,\dots,T\\
+\end{aligned}
+$$
+
+Therefore it could be used, but the objective function would have to be corrected by the value of $\omega$ and in general this formulation is harder to work with.
+
+
+Mean-variance:
+$$
+\hat{\sigma}^2 = \sum_i \sum_j x_i x_j \hat{\sigma}_i \hat{\sigma}_j \rho_{ij}
+$$
+
+Cannot be used in a linear programming problem, as it involves multiplication of decision variables  $x_i x_j$. 
+This would make it a quadratic problem.\newline
+
 \clearpage\newpage
 
 ## Subtask 8.e
+
+We can model this feature by adding aditional variable $\theta_j$ what will be binary, indicator-type for $x_j$
+
+$$
+\begin{aligned}
+& \max && \sum_{j=1}^{N} c_j x_j \\[2mm]
+& && \sum_{j=1}^{N} x_j \, \widehat{R}_j \ge \alpha + \epsilon (\beta - \alpha), \\[1mm]
+& && \sum_{j=1}^{N} x_j = 1, \\[1mm]
+& && \sum_{j=1}^{N} \theta_j \leq M, \\[1mm]
+& && x_j \leq \theta_j \quad j = 1,\dots,N \\\\
+& && x_j \ge 0 \quad j = 1,\dots,N \\
+& &&\theta_j \in \left\{\mathbf{0},\mathbf{1}\right\} \quad j = 1,\dots,N \\
+\end{aligned}
+$$
+
+Here $\theta_j = 0$ makes corresponding $x_j = 0$ and
+$\theta_j = 1$ makes corresponding $x_j \in [0, 1]$ \newline
+Sum of all $\theta_j$ ensures that maximum different assets bought is $\leq M$
+
 \clearpage\newpage
 
 ## Subtask 8.f
+
+We can reuse model from previous task:
+
+$$
+\begin{aligned}
+& \max && \sum_{j=1}^{N} c_j x_j \\[2mm]
+& && \sum_{j=1}^{N} x_j \, \widehat{R}_j \ge \alpha + \epsilon (\beta - \alpha), \\[1mm]
+& && \sum_{j=1}^{N} x_j = 1, \\[1mm]
+& && \sum_{j=1}^{N} \theta_j \leq M, \\[1mm]
+& && x_j \leq \theta_j \quad j = 1,\dots,N \\\\
+& && x_j \ge 0 \quad j = 1,\dots,N \\
+& &&\theta_j \in \left\{\mathbf{0},\mathbf{1}\right\} \quad j = 1,\dots,N \\
+\end{aligned}
+$$
+
+By removing maximum different assets constraint and adding a new one with corresponding variable $v$ that will be responsible for minimum $x$ value.
+We can do that by adding another constraint that, when corresponding $\theta_j \neq 0$ will enforce $x_j \in [v, 1]$
+
+$$
+\begin{aligned}
+& \max && \sum_{j=1}^{N} c_j x_j \\[2mm]
+& && \sum_{j=1}^{N} x_j \, \widehat{R}_j \ge \alpha + \epsilon (\beta - \alpha), \\[1mm]
+& && \sum_{j=1}^{N} x_j = 1, \\[1mm]
+& && x_j \leq \theta_j \quad j = 1,\dots,N \\\\
+& && v \cdot  \theta_j \leq x_j \quad j = 1,\dots,N \\\\
+& && x_j \ge 0 \quad j = 1,\dots,N \\
+& &&\theta_j \in \left\{\mathbf{0},\mathbf{1}\right\} \quad j = 1,\dots,N \\
+\end{aligned}
+$$
+
+This ensures that all $x$ stay within bounds.
+
 \clearpage\newpage
