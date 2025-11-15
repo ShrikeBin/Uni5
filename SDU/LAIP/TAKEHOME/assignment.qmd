@@ -510,6 +510,8 @@ $$
 \end{matrix}
 $$
 
+Q.E.D.
+
 \clearpage\newpage
 
 
@@ -778,16 +780,179 @@ Nodes were opened in alphabetical order (i.e. A $\rightarrow$ B $\rightarrow$ C 
 
 \end{tikzpicture}
 
-
 \clearpage\newpage
 
 
 # Task 7
 
 ## Subtask 7.a
+Firstly let us note *Hamming Distance* $H_d$ between two words $w_i, w_j$ of lenght $d$\newline
+i.e. $w_i, w_j \in \left\{\mathbf{0},\mathbf{1}\right\}^d$
+$$
+H_d(w_i, w_j)
+= \sum_{k=1}^{d} \mathbf{1}\!\left( w_i[k] \neq w_j[k] \right)
+$$
+
+$k$ being the index of a word being checked and $\mathbf{1}$ indicator function \newline
+
+Our problem can then be expressed as:
+$$
+\max\limits_{}\left\{\min\limits{}
+\left\{
+  H_d(w_i,w_j)
+\right\}
+\right\} \text{  for } i,i \in \left\{1 \cdots N\right\}
+$$
+
+across all $w_i \neq w_j$ of $|w_i| = |w_j|$ \newline
+
+We transform it into *Mathematical Programming form* by first denoting:
+$$
+M_d = 
+\min\limits{}
+\left\{
+  H_d(w_i,w_j)
+\right\}\text{  for } i,i \in \left\{1 \cdots N\right\}
+$$
+
+And subsequently transforming the formulation into:
+
+$$
+\begin{aligned}
+&\max\limits_{} M_d \\
+&\sum_{k=1}^{d} \mathbf{1}\!\left( w_i[k] \neq w_j[k] \right) \geq M_d \\
+&\text{for } 1 \leq i < j \leq N
+\end{aligned}
+$$
+
+To make the constraints more workable:
+
+$$
+\begin{aligned}
+&\max\limits_{} M_d \\
+&\sum_{k=1}^{d} | w_i[k] -w_j[k] | \geq M_d \\
+&\text{for } 1 \leq i < j \leq N \\
+&\mathop{\forall}\limits_{j,k,i} \text{  } w_i[k], w_j[k] \in \left\{\mathbf{0},\mathbf{1}\right\}
+\end{aligned}
+$$
+
+This formulation has exactly $\frac{N(N-1)}{2}$ constraints (all unique pairs)
+and $N \cdot d$ variables ($N$ words of lenght $d$) \newline
+We would like however to get rid of not explicitily linear absolute value in the constraints. We can do that by introductiong another variable that will replace it, let's call it $\gamma$:
+
+$$
+\gamma_{i,j,k} \approx | w_i[k] -w_j[k] |
+$$
+
+We have to bound it so that in all possible situations it is forced to hold a correct value:
+
+$$
+\begin{matrix}
+\begin{aligned}
+&\gamma_{i,j,k} \leq 2 - (w_i[k] +w_j[k])\\
+&\gamma_{i,j,k} \leq w_i[k] +w_j[k]\\
+&\gamma_{i,j,k} \geq w_i[k] -w_j[k]\\
+&\gamma_{i,j,k} \geq w_j[k] -w_i[k]  
+\end{aligned}
+\end{matrix}
+$$
+
+We can se that using those we can replace absolute value in all cases:
+
+$$
+\begin{matrix}
+\begin{aligned}
+& w_i[k] , w_j[k] = (0,0)\\\\
+&\gamma_{i,j,k} \leq 2\\
+&\gamma_{i,j,k} \leq 0\\
+&\gamma_{i,j,k} \geq 0\\
+&\gamma_{i,j,k} \geq 0\\
+&\Rightarrow \gamma_{i,j,k} = 0  
+\end{aligned}
+&
+\quad \quad\
+&
+\begin{aligned}
+& w_i[k] , w_j[k] = (1,1)\\\\
+&\gamma_{i,j,k} \leq 0\\
+&\gamma_{i,j,k} \leq 2\\
+&\gamma_{i,j,k} \geq 0\\
+&\gamma_{i,j,k} \geq 0 \\
+&\Rightarrow \gamma_{i,j,k} = 0   
+\end{aligned}
+\\
+\\
+\begin{aligned}
+& w_i[k] , w_j[k] = (0,1)\\\\
+&\gamma_{i,j,k} \leq 1\\
+&\gamma_{i,j,k} \leq 1\\
+&\gamma_{i,j,k} \geq -1\\
+&\gamma_{i,j,k} \geq 1  \\
+&\Rightarrow \gamma_{i,j,k} = 1
+\end{aligned}
+&
+\quad \quad\
+&
+\begin{aligned}
+& w_i[k] , w_j[k] = (1,0)\\\\
+&\gamma_{i,j,k} \leq 1\\
+&\gamma_{i,j,k} \leq 1\\
+&\gamma_{i,j,k} \geq 1\\
+&\gamma_{i,j,k} \geq -1 \\
+&\Rightarrow \gamma_{i,j,k} = 1   
+\end{aligned}
+\end{matrix}
+$$
+
+Combinig that our new formulation looks as follows:
+
+$$
+\begin{aligned}
+&\max\limits_{} M_d \\
+&\left\{\sum_{k=1}^{d} \gamma_{i,j,k} \geq M_d \right\}\quad 1 \leq i < j \leq N \\
+&\left\{\begin{aligned}
+&\gamma_{i,j,k} \leq 2 - (w_i[k] +w_j[k])\\
+&\gamma_{i,j,k} \leq w_i[k] +w_j[k]\\
+&\gamma_{i,j,k} \geq w_i[k] -w_j[k]\\
+&\gamma_{i,j,k} \geq w_j[k] -w_i[k] \\
+\end{aligned}\right\}
+\begin{aligned}
+&1 \leq i < j \leq N \\\\
+&1 \leq k \leq d
+\end{aligned}\\
+&\mathop{\forall}\limits_{j,k,i}\text{  } \gamma_{i,j,k} \in \mathbb{R}\\
+&\mathop{\forall}\limits_{j,k,i} \text{  } w_i[k], w_j[k] \in \left\{\mathbf{0},\mathbf{1}\right\}
+\end{aligned}
+$$
+
+That yields a total of ($\frac{N(N-1)}{2} + 4d\frac{N(N-1)}{2}$) constraints
+and ($N \cdot d + d\frac{N(N-1)}{2}$) variables ($w_i[k] + \gamma_{i,j,k}$) \newline
+
 \clearpage\newpage
 
 ## Subtask 7.b
+
+$$
+\begin{aligned}
+&\max\limits_{} M_d \\\\
+&\sum_{k=1}^{d} \gamma_{i,j,k} \geq M_d \quad \quad 1 \leq i < j \leq N \\
+&\begin{aligned}
+&\gamma_{i,j,k} \leq 2 - (w_i[k] +w_j[k])\\
+&\gamma_{i,j,k} \leq w_i[k] +w_j[k]\\
+&\gamma_{i,j,k} \geq w_i[k] -w_j[k]\\
+&\gamma_{i,j,k} \geq w_j[k] -w_i[k] \\
+\end{aligned}\quad
+\begin{aligned}
+&1 \leq i < j \leq N \\\\
+&1 \leq k \leq d
+\end{aligned}\\\\
+&\mathop{\forall}\limits_{j,k,i}\text{  } \gamma_{i,j,k} \in \mathbb{R}\\
+&\mathop{\forall}\limits_{j,k,i} \text{  } w_i[k], w_j[k] \in \left\{\mathbf{0},\mathbf{1}\right\}
+\end{aligned}
+$$
+
+In the final formulation the problem belongs to the **Mixed Integer Lineary Programming** family as its constraints are all linear and some of the variables ($\gamma$) can be real, the other ($w_i[k]$) integer. It's worth noting however that all integer variables here are **binary** therefore it's more of a *Mixed Binary Lineary Programming*, which *might* be a bit easier to solve than regular *Integer* programming.
+
 \clearpage\newpage
 
 
