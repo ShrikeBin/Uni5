@@ -1,8 +1,9 @@
-#!/usr/bin/python3
 from mip import Model, xsum, CONTINUOUS, MINIMIZE
 import matplotlib.pyplot as plt
 import sys
 import numpy as np
+
+SEE_DETAILED_ALLOCATIONS = False
 
 class Data:
     def __init__(self, filename):
@@ -22,7 +23,6 @@ class Data:
             self.r[j,t]=val
 
         self.mean_r = np.mean(self.r, axis=1)
-        self.c = np.mean(self.r - self.mean_r[:, None], axis=1)
         self.min_r = np.max([0, np.min(self.mean_r)])
         self.max_r = np.max(self.mean_r)
         
@@ -32,31 +32,39 @@ class Data:
 def solve(data, epsilon):
     m = Model("portfolio", sense=MINIMIZE)
 
-    # Threshold B
-    B = data.min_r + (epsilon/100)*(data.max_r - data.min_r)
-
     N = data.N
+    T = data.T
     R_hat = data.mean_r
-    c = data.c
+    r = data.r
 
-    # Variables x_j >= 0
-    x = [m.add_var(var_type=CONTINUOUS, lb=0) for j in range(N)]
+    # The Minimum Return
+    B = data.min_r + (epsilon / 100.0) * (data.max_r - data.min_r)
+
+    # Decision variables
+    x = [m.add_var(var_type=CONTINUOUS, lb=0) for _ in range(N)]
+    tau = [m.add_var(var_type=CONTINUOUS) for _ in range(T)]
 
     # Objective function
-    m.objective = xsum(c[j]*x[j] for j in range(N))
+    m.objective = (1 / T) * xsum(tau[t] for t in range(T))
 
-    # Constraint 1
-    m += xsum(R_hat[j]*x[j] for j in range(N)) >= B
+    # Minimum Return
+    m += xsum(R_hat[j] * x[j] for j in range(N)) >= B
 
-    # Constraint 2 (all money)
+    # All money
     m += xsum(x[j] for j in range(N)) == 1
+
+    # Tau constraints
+    for t in range(T):
+        expr = xsum(x[j] * (r[j, t] - R_hat[j]) for j in range(N))
+        m += (tau[t] >= expr)
+        m += (tau[t] >= -expr)
 
     status = m.optimize()
 
+    if status is None:
+        return B, 0, None
+
     x_values = [x[j].x for j in range(N)]
-     
-    if status == None:
-        return B, 0
     return B, m.objective_value, x_values
 
 
@@ -77,8 +85,9 @@ def main(argv):
 
         rewards[i] = B_val
         risks[i] = obj_val
-
         positive_x = [(j+1, x) for j, x in enumerate(x_values) if x > 0]
+        if not SEE_DETAILED_ALLOCATIONS:
+            positive_x = len(positive_x)
 
         portfolio_info.append({
             "epsilon": epsilon,
@@ -100,7 +109,10 @@ def main(argv):
     for info in portfolio_info:
         epsilon = info['epsilon']
         positive_x = info['allocations']
-        alloc_str = ", ".join([f"x_{j} = {x:.4f}" for j, x in positive_x])
+        if(SEE_DETAILED_ALLOCATIONS):
+            alloc_str = ", ".join([f"x_{j} = {x:.4f}" for j, x in positive_x])
+        else:
+            alloc_str = f"different assets: {positive_x}"
         text_str += f"\nε = {epsilon}: \n{alloc_str}\n"
 
     plt.text(0, 1, text_str, fontsize=12, va='top', ha='left', wrap=True)

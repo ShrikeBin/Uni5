@@ -948,6 +948,7 @@ Let's first denote:
 - $r_{jt}$ = value of historical return on investment $j$ from month $t$ to month $t + 1$
 - $\epsilon$ = parameter determining minimum reward
 - $x_j$ = variable representing fraction of total resources put into asset $j$
+- $\tau_t$ = variable that will replace the absolute value in objective function
 
 Then our variables used in model will be:
 
@@ -955,27 +956,27 @@ $$
 \begin{matrix}
 \begin{aligned}
 \hat{R_j} &= \frac{1}{T} \sum_{t=1}^T{r_{jt}}\\\\
-c_j &= \frac{1}{T}\sum_{t=1}^T{(r_jt - \hat{R_j})}\\\\
 \alpha &= \max\Big( 0, \min_j \hat{R}_j \Big)\\\\
 \beta &= \max_j \hat{R}_j\\\\
 \hat{R} &= \sum_{j=1}^N{x_jR_{j}} =\\
 &= \text{reward}\\\\
-\widehat{\text{MAD}} &= \frac{1}{T}\sum_{t=1}^T{\left[\sum_{j=1}^N{x_j(r_jt - \hat{R_j})}\right]} = \\
-&=\sum_{j=1}^N{x_j\left[\frac{1}{T}\sum_{t=1}^T{(r_jt - \hat{R_j})}\right]} =\\
-&= \sum_{j=1}^{N} c_j x_j=\\
+\widehat{\text{MAD}} &= \frac{1}{T}\sum_{t=1}^T{\left[\left|\sum_{j=1}^N{x_j(r_jt - \hat{R_j})}\right|\right]}\\
 &= \text{risk}\\\\
 \end{aligned}
 \end{matrix}
 $$
 
 \newpage
+We want to replace the absolute value with something more linear, let's introduce a set of additional variables responisble for that, $\tau_t$
 Assuming that all the fractions have to sum up to 1, i.e. we *have to* invest all of our resources, the model is as follows:
 
 $$
 \begin{aligned}
-& \max && \sum_{j=1}^{N} c_j x_j \\\\
+& \min && \frac{1}{T}\sum_{t=1}^T{\tau_t} \\\\
 & && \sum_{j=1}^{N} x_j \, \hat{R}_j \ge \alpha + \epsilon (\beta - \alpha), \\
-& && \sum_{j=1}^{N} x_j = 1, \\
+& && \sum_{j=1}^{N} x_j = 1, \\\\
+& && \tau_t \geq \sum_{j=1}^N{x_j(r_jt - \hat{R_j})}\quad t = 1,\dots T\\
+& && \tau_t \geq -\sum_{j=1}^N{x_j(r_jt - \hat{R_j})}\quad t = 1,\dots T\\\\
 & && x_j \ge 0, \quad j = 1,\dots,N
 \end{aligned}
 $$
@@ -989,20 +990,23 @@ Model:
 
 $$
 \begin{aligned}
-& \max && \sum_{j=1}^{N} c_j x_j \\
-& && \sum_{j=1}^{N} x_j \, \widehat{R}_j \ge \alpha + \epsilon (\beta - \alpha), \\
-& && \sum_{j=1}^{N} x_j = 1, \\
-& && x_j \geq 0, \quad j = 1,\dots,N
+& \min && \frac{1}{T}\sum_{t=1}^T{\tau_t} \\\\
+& && \sum_{j=1}^{N} x_j \, \hat{R}_j \ge \alpha + \epsilon (\beta - \alpha), \\
+& && \sum_{j=1}^{N} x_j = 1, \\\\
+& && \tau_t \geq \sum_{j=1}^N{x_j(r_jt - \hat{R_j})}\quad t = 1,\dots T\\
+& && \tau_t \geq -\sum_{j=1}^N{x_j(r_jt - \hat{R_j})}\quad t = 1,\dots T\\\\
+& && \mathop{\forall}\limits_{j} x_j \ge \\
+& && \mathop{\forall}\limits_{t} \tau_t \in \mathbb{R}
 \end{aligned}
 $$
 
-Has exactly $N$ variables and $2$ (or $N+2$ if we include $x_j \geq 0$) constraints
+Has exactly $2N$ variables and $2N + 2$ (or $3N+2$ if we include $x_j \geq 0$) constraints
 \clearpage\newpage
 
 ## Subtask 8.c 
 
 As gurobi was available only with license I used **mip** solver that is free.
-The soluton is based on provided template, adjusted to use **mip** and my model (additional $c_j$ for simpler calculations):
+The soluton is based on provided template, adjusted to use **mip** and my model:
 
 ```{python}
 #| eval: false
@@ -1010,6 +1014,8 @@ from mip import Model, xsum, CONTINUOUS, MINIMIZE
 import matplotlib.pyplot as plt
 import sys
 import numpy as np
+
+SEE_DETAILED_ALLOCATIONS = False
 
 class Data:
     def __init__(self, filename):
@@ -1029,7 +1035,6 @@ class Data:
             self.r[j,t]=val
 
         self.mean_r = np.mean(self.r, axis=1)
-        self.c = np.mean(self.r - self.mean_r[:, None], axis=1)
         self.min_r = np.max([0, np.min(self.mean_r)])
         self.max_r = np.max(self.mean_r)
         
@@ -1039,31 +1044,39 @@ class Data:
 def solve(data, epsilon):
     m = Model("portfolio", sense=MINIMIZE)
 
-    # Threshold B
-    B = data.min_r + (epsilon/100)*(data.max_r - data.min_r)
-
     N = data.N
+    T = data.T
     R_hat = data.mean_r
-    c = data.c
+    r = data.r
 
-    # Variables x_j >= 0
-    x = [m.add_var(var_type=CONTINUOUS, lb=0) for j in range(N)]
+    # The Minimum Return
+    B = data.min_r + (epsilon / 100.0) * (data.max_r - data.min_r)
+
+    # Decision variables
+    x = [m.add_var(var_type=CONTINUOUS, lb=0) for _ in range(N)]
+    tau = [m.add_var(var_type=CONTINUOUS) for _ in range(T)]
 
     # Objective function
-    m.objective = xsum(c[j]*x[j] for j in range(N))
+    m.objective = (1 / T) * xsum(tau[t] for t in range(T))
 
-    # Constraint 1
-    m += xsum(R_hat[j]*x[j] for j in range(N)) >= B
+    # Minimum Return
+    m += xsum(R_hat[j] * x[j] for j in range(N)) >= B
 
-    # Constraint 2 (all money)
+    # All money
     m += xsum(x[j] for j in range(N)) == 1
+
+    # Tau constraints
+    for t in range(T):
+        expr = xsum(x[j] * (r[j, t] - R_hat[j]) for j in range(N))
+        m += (tau[t] >= expr)
+        m += (tau[t] >= -expr)
 
     status = m.optimize()
 
+    if status is None:
+        return B, 0, None
+
     x_values = [x[j].x for j in range(N)]
-     
-    if status == None:
-        return B, 0
     return B, m.objective_value, x_values
 
 
@@ -1084,8 +1097,9 @@ def main(argv):
 
         rewards[i] = B_val
         risks[i] = obj_val
-
         positive_x = [(j+1, x) for j, x in enumerate(x_values) if x > 0]
+        if not SEE_DETAILED_ALLOCATIONS:
+            positive_x = len(positive_x)
 
         portfolio_info.append({
             "epsilon": epsilon,
@@ -1107,7 +1121,10 @@ def main(argv):
     for info in portfolio_info:
         epsilon = info['epsilon']
         positive_x = info['allocations']
-        alloc_str = ", ".join([f"x_{j} = {x:.4f}" for j, x in positive_x])
+        if(SEE_DETAILED_ALLOCATIONS):
+            alloc_str = ", ".join([f"x_{j} = {x:.4f}" for j, x in positive_x])
+        else:
+            alloc_str = f"different assets: {positive_x}"
         text_str += f"\nε = {epsilon}: \n{alloc_str}\n"
 
     plt.text(0, 1, text_str, fontsize=12, va='top', ha='left', wrap=True)
@@ -1125,10 +1142,9 @@ if __name__ == "__main__":
     main(sys.argv[1:])
 ```
 
-| Risk/Reward plot |x's|
+| | Risk/Reward plot |x's|
 |------------------|-----------------|
 | ![](reward.png){width=75%} | ![](x.png){width=25%} |
-
 \clearpage\newpage
 
 ## Subtask 8.d 
@@ -1177,13 +1193,16 @@ We know that upper bound of each $x_j$ is 1 (you cannot spend more than 100% of 
 
 $$
 \begin{aligned}
-& \max && \sum_{j=1}^{N} c_j x_j \\
+& \min && \frac{1}{T}\sum_{t=1}^T{\tau_t} \\\\
 & && \sum_{j=1}^{N} x_j \, \hat{R}_j \ge \alpha + \epsilon (\beta - \alpha), \\
 & && \sum_{j=1}^{N} x_j = 1, \\
-& && \sum_{j=1}^{N} \theta_j \leq M, \\
+& && \sum_{j=1}^{N} \theta_j \leq M, \\\\
+& && \tau_t \geq \sum_{j=1}^N{x_j(r_jt - \hat{R_j})}\quad t = 1,\dots T\\
+& && \tau_t \geq -\sum_{j=1}^N{x_j(r_jt - \hat{R_j})}\quad t = 1,\dots T\\\\
 & && x_j \leq \theta_j \quad j = 1,\dots,N \\\\
 & &&\mathop{\forall}\limits_{j} x_j  \geq 0 \\
 & &&\mathop{\forall}\limits_{j} \theta_j \in \left\{\mathbf{0},\mathbf{1}\right\} \\
+& && \mathop{\forall}\limits_{t} \tau_t \in \mathbb{R}
 \end{aligned}
 $$
 
@@ -1202,13 +1221,16 @@ We can reuse model from previous task:
 
 $$
 \begin{aligned}
-& \max && \sum_{j=1}^{N} c_j x_j \\
+& \min && \frac{1}{T}\sum_{t=1}^T{\tau_t} \\\\
 & && \sum_{j=1}^{N} x_j \, \hat{R}_j \ge \alpha + \epsilon (\beta - \alpha), \\
 & && \sum_{j=1}^{N} x_j = 1, \\
-& && \sum_{j=1}^{N} \theta_j \leq M, \\
+& && \sum_{j=1}^{N} \theta_j \leq M, \\\\
+& && \tau_t \geq \sum_{j=1}^N{x_j(r_jt - \hat{R_j})}\quad t = 1,\dots T\\
+& && \tau_t \geq -\sum_{j=1}^N{x_j(r_jt - \hat{R_j})}\quad t = 1,\dots T\\\\
 & && x_j \leq \theta_j \quad j = 1,\dots,N \\\\
 & &&\mathop{\forall}\limits_{j} x_j  \geq 0 \\
 & &&\mathop{\forall}\limits_{j} \theta_j \in \left\{\mathbf{0},\mathbf{1}\right\} \\
+& && \mathop{\forall}\limits_{t} \tau_t \in \mathbb{R}
 \end{aligned}
 $$
 
@@ -1217,13 +1239,17 @@ We can do that by adding another constraint that, when corresponding $\theta_j =
 
 $$
 \begin{aligned}
-& \max && \sum_{j=1}^{N} c_j x_j \\\\
-& && \sum_{j=1}^{N} x_j \, \widehat{R}_j \ge \alpha + \epsilon (\beta - \alpha), \\
+& \min && \frac{1}{T}\sum_{t=1}^T{\tau_t} \\\\
+& && \sum_{j=1}^{N} x_j \, \hat{R}_j \ge \alpha + \epsilon (\beta - \alpha), \\
 & && \sum_{j=1}^{N} x_j = 1, \\
-& && x_j \leq \theta_j \quad j = 1,\dots,N \\
+& && \sum_{j=1}^{N} \theta_j \leq M, \\\\
+& && \tau_t \geq \sum_{j=1}^N{x_j(r_jt - \hat{R_j})}\quad t = 1,\dots T\\
+& && \tau_t \geq -\sum_{j=1}^N{x_j(r_jt - \hat{R_j})}\quad t = 1,\dots T\\\\
+& && x_j \leq \theta_j \quad j = 1,\dots,N \\\\
 & && \theta_j v \leq x_j \quad j = 1,\dots,N \\\\
 & &&\mathop{\forall}\limits_{j} x_j  \geq 0 \\
 & &&\mathop{\forall}\limits_{j} \theta_j \in \left\{\mathbf{0},\mathbf{1}\right\} \\
+& && \mathop{\forall}\limits_{t} \tau_t \in \mathbb{R}
 \end{aligned}
 $$
 
