@@ -46,13 +46,13 @@ $$
 \end{aligned}
 $$
 
-By inspection of the objective function:
+By inspection of the objective function we can deduct the potential values of variables:
 
 $$
 \begin{aligned}
-4x_1 \Rightarrow 4 &\text{ is positive } \Rightarrow x_1 \text{ as large as possible}, \\
-5x_2 \Rightarrow 5 &\text{ is positive } \Rightarrow x_2 \text{ as large as possible}, \\
--7x_3 \Rightarrow -7 &\text{ is negative } \Rightarrow x_3 \text{ as small as possible}.
+4x_1 \Rightarrow 4 &\text{ is positive } \Rightarrow x_1 \text{ make as large as possible}, \\
+5x_2 \Rightarrow 5 &\text{ is positive } \Rightarrow x_2 \text{ make as large as possible}, \\
+-7x_3 \Rightarrow -7 &\text{ is negative } \Rightarrow x_3 \text{ make as small as possible}.
 \end{aligned}
 $$
 
@@ -133,8 +133,8 @@ It is **impossible** to set $s,t$ such that the problem becomes *infeasible*, we
 
 First, we transform the problem into the standard form:
 
-- Change a minimization into a maximization:  
-  $\min (c^T x)$ into $-\max - (c^T x)$.
+- Change a minimization into a maximization: 
+$\min (c^T x)$ into $-\max - (c^T x)$.
 - Replace equalities with two inequalities.  
 - Convert all constraints to "$\le$".  
 
@@ -142,7 +142,7 @@ The result is:
 
 $$
 \begin{aligned}
-\max  -3x_1 - 2x_2 - 7x_3 \\
+-\max  -3x_1 - 2x_2 - 7x_3 \\
   -x_1 + x_2 &\le 10, \\
 x_1 - x_2 &\le -10, \\
 -2x_1 + x_2 - x_3 &\le -10.
@@ -152,29 +152,10 @@ $$
 Then the tableau looks like:
 
 ```{python}
-SLACK_COUNT = 3
-
-A = np.array([[-1, -1, 0],
-              [1,  -1, 0],
-              [-2, 1, -1]], dtype=object)
-C = np.array([-3, -2, -7], dtype=object)
-B = np.array([10, -10,-10], dtype=object)
-
-A = np.vectorize(Fraction)(A)
-C = np.vectorize(Fraction)(C)
-B = np.vectorize(Fraction)(B)
-
-I = np.array([[Fraction(int(i == j)) for j in range(SLACK_COUNT)] \
-for i in range(SLACK_COUNT)], dtype=object)
-Z = np.array([Fraction(0) for _ in range(SLACK_COUNT)], dtype=object)
-
-T = np.concatenate([A.T, I], axis=1)
-T = np.column_stack((T, Z))
-T = np.column_stack((T, B))
-T = np.vstack((T, np.concatenate([C, np.full(SLACK_COUNT, Fraction(0), \
-dtype=object), [Fraction(1), Fraction(0)]])))
-
-print("\n \n") # for pdf formating
+T = np.array([[-1,1,0,1,0,0,0,10],
+              [1,-1,0,0,1,0,0,-10],
+              [-2,1,-1,0,0,1,0,-10],
+              [-3,-2,-7,0,0,0,1,0]],dtype=object)
 
 tableau(T)
 ```
@@ -275,7 +256,7 @@ with objective value $110$.
 ## Subtask 4.a
 
 We denote original problem as **P** and relaxed original problem as **PR**
-Let's start by considering the original problem with marked constraints by $\alpha, \beta, \gamma$
+Let's start by considering the original problem (with marked constraints by potential dual variables $\alpha, \beta, \gamma$)
 
 $$
 \begin{aligned}
@@ -421,7 +402,7 @@ $$
 \end{matrix}
 $$
 
-To get new Objective function we take the sums uncorrelated with $y,x$ in front of the $\min_{\text{by all } y, x}\left\{\vdots \right\}.$
+To get new Objective function we take the sums uncorrelated with $y,x$ in front of the $\min_{\text{by all } y, x}\left\{\vdots \right\}.$ which are: $\sum_{j=1}^m \beta_j + \sum_{i=1}^n \gamma_i$
 Now we want to:
 
 $$
@@ -575,12 +556,11 @@ $$
 \end{aligned}
 $$
 
-To check whether or not the solution with this basis is optimal we just need to compute $c_n^T - c_B^T A_B^{-1} A_N$ (new reduced costs)
-which in our case can be easily done by hand:
+To check whether or not the solution with this basis is optimal we just need to compute \newline $c_n^T - c_B^T A_B^{-1} A_N$ (new reduced costs), which in our case can be easily done by hand:
 
 $$
 \begin{aligned}
-&\begin{bmatrix}
+\begin{bmatrix}
 0 & 0
 \end{bmatrix} -
 \begin{bmatrix}
@@ -593,22 +573,22 @@ $$
 \begin{bmatrix}
 1 & 0\\
 0 & 1
-\end{bmatrix} = \\
-&\begin{bmatrix}
+\end{bmatrix} &= \\\\
+=\begin{bmatrix}
 0 & 0
 \end{bmatrix} -
 \begin{bmatrix}
 (\frac{4}{5} + \frac{1}{5}) & (\frac{7}{5} +\frac{3}{5})
-\end{bmatrix} = \\
-&\begin{bmatrix}
+\end{bmatrix} &= \\\\
+=\begin{bmatrix}
 0 & 0
 \end{bmatrix} -
 \begin{bmatrix}
 1 & 2
-\end{bmatrix} = \\
-&\begin{bmatrix}
+\end{bmatrix} &= \\\\
+=\begin{bmatrix}
 -1 & -2
-\end{bmatrix}
+\end{bmatrix}&
 \end{aligned}
 $$
 
@@ -618,7 +598,7 @@ As we can see all reduced costs $\leq 0$, therefore solution is optimal
 
 ## Subtask 5.b
 
-Firstly we need to calculate the values $x_1,x_2,s_1,s_2$ in the optimal solution
+Firstly we need to calculate the values $x_1,x_2,x_3,x_4$ in the optimal solution
 this can be done by calculatng $A_B^{-1}b$:
 
 $$
@@ -642,7 +622,6 @@ B = \begin{bmatrix}
 $$
 
 Therefore $x_1 = 11 \frac{1}{5}$ and $x_2 = 1 \frac{4}{5}$.
-for convinience not that $s_1 = x_3$ , $s_2 = x_4$
 Let's calculate new non basic $A$
 
 $$
@@ -662,6 +641,8 @@ $$
 \;\ge\; \bar{b}_u - \lfloor \bar{b}_u \rfloor
 \end{aligned}
 $$
+
+for convinience not that $x_3 = s_1$ , $x_4 = s_2$ - slacks
 
 $$
 \begin{matrix}
@@ -857,7 +838,7 @@ $$
 \end{matrix}
 $$
 
-We can se that using those we can replace absolute value in all cases:
+We see that using previously mentioned bounds we can replace absolute value in all cases:
 
 $$
 \begin{matrix}
@@ -951,7 +932,7 @@ $$
 \end{aligned}
 $$
 
-In the final formulation the problem belongs to the **Mixed Integer Lineary Programming** family as its constraints are all linear and some of the variables ($\gamma$) can be real, the other ($w_i[k]$) integer. It's worth noting however that all integer variables here are **binary** therefore it's more of a *Mixed Binary Lineary Programming*, which *might* be a bit easier to solve than regular *Integer* programming.
+In the final formulation the problem belongs to the **Mixed Integer Linear Programming** family as its constraints are all linear and some of the variables ($\gamma$) can be real, the other ($w_i[k]$) integer. It's worth noting however that all integer variables here are **binary** therefore it's more of a *Mixed Binary Linear Programming*, which *might* be a bit easier to solve than regular *Integer* programming.
 
 \clearpage\newpage
 
@@ -964,38 +945,37 @@ Let's first denote:
 
 - $j \in N$ = set of availible assets to invest in
 - $t \in T$ = set of all months where return data is given
-- $r_{jt}$ = variable denoting historical return on investment $j$ from month $t$ to month $t + 1$
+- $r_{jt}$ = value of historical return on investment $j$ from month $t$ to month $t + 1$
 - $\epsilon$ = parameter determining minimum reward
-- $x_j$ = fraction of total money put into asset $j$
+- $x_j$ = variable representing fraction of total resources put into asset $j$
 
 Then our variables used in model will be:
 
 $$
 \begin{matrix}
 \begin{aligned}
-\hat{R_j} &= \frac{1}{T} \sum_{t=1}^T{r_{jt}}\\
-\hat{R} &= \sum_{j=1}^N{x_jR_{j}}\\
+\hat{R_j} &= \frac{1}{T} \sum_{t=1}^T{r_{jt}}\\\\
+c_j &= \frac{1}{T}\sum_{t=1}^T{(r_jt - \hat{R_j})}\\\\
+\alpha &= \max\Big( 0, \min_j \hat{R}_j \Big)\\\\
+\beta &= \max_j \hat{R}_j\\\\
+\hat{R} &= \sum_{j=1}^N{x_jR_{j}} =\\
+&= \text{reward}\\\\
 \widehat{\text{MAD}} &= \frac{1}{T}\sum_{t=1}^T{\left[\sum_{j=1}^N{x_j(r_jt - \hat{R_j})}\right]} = \\
-&=\sum_{j=1}^N{x_j\left[\frac{1}{T}\sum_{t=1}^T{(r_jt - \hat{R_j})}\right]}
-\end{aligned}
-&
-\quad
-&
-\begin{aligned}
-c_j &= \frac{1}{T}\sum_{t=1}^T{(r_jt - \hat{R_j})}\\
-\alpha &= \max\Big( 0, \min_j \hat{R}_j \Big)\\
-\beta &= \max_j \hat{R}_j
+&=\sum_{j=1}^N{x_j\left[\frac{1}{T}\sum_{t=1}^T{(r_jt - \hat{R_j})}\right]} =\\
+&= \sum_{j=1}^{N} c_j x_j=\\
+&= \text{risk}\\\\
 \end{aligned}
 \end{matrix}
 $$
 
-And the model is (assumed we *have to use all money*):
+\newpage
+Assuming that all the fractions have to sum up to 1, i.e. we *have to* invest all of our resources, the model is as follows:
 
 $$
 \begin{aligned}
-& \max && \sum_{j=1}^{N} c_j x_j \\[2mm]
-& && \sum_{j=1}^{N} x_j \, \widehat{R}_j \ge \alpha + \epsilon (\beta - \alpha), \\[1mm]
-& && \sum_{j=1}^{N} x_j = 1, \\[1mm]
+& \max && \sum_{j=1}^{N} c_j x_j \\\\
+& && \sum_{j=1}^{N} x_j \, \hat{R}_j \ge \alpha + \epsilon (\beta - \alpha), \\
+& && \sum_{j=1}^{N} x_j = 1, \\
 & && x_j \ge 0, \quad j = 1,\dots,N
 \end{aligned}
 $$
@@ -1009,9 +989,9 @@ Model:
 
 $$
 \begin{aligned}
-& \max && \sum_{j=1}^{N} c_j x_j \\[2mm]
-& && \sum_{j=1}^{N} x_j \, \widehat{R}_j \ge \alpha + \epsilon (\beta - \alpha), \\[1mm]
-& && \sum_{j=1}^{N} x_j = 1, \\[1mm]
+& \max && \sum_{j=1}^{N} c_j x_j \\
+& && \sum_{j=1}^{N} x_j \, \widehat{R}_j \ge \alpha + \epsilon (\beta - \alpha), \\
+& && \sum_{j=1}^{N} x_j = 1, \\
 & && x_j \geq 0, \quad j = 1,\dots,N
 \end{aligned}
 $$
@@ -1021,7 +1001,8 @@ Has exactly $N$ variables and $2$ (or $N+2$ if we include $x_j \geq 0$) constrai
 
 ## Subtask 8.c 
 
-As gurobi was availible only with license I used **mip** solver that is free:
+As gurobi was available only with license I used **mip** solver that is free.
+The soluton is based on provided template, adjusted to use **mip** and my model (additional $c_j$ for simpler calculations):
 
 ```{python}
 #| eval: false
@@ -1153,7 +1134,7 @@ if __name__ == "__main__":
 ## Subtask 8.d 
 
 
-Worst-period return objective:
+**Worst-period return** objective:
 $$
 \max \min_{t=1,\dots,T} \sum_{j=1}^n x_j r_{jt}
 $$
@@ -1166,7 +1147,8 @@ $$
 \end{aligned}
 $$
 
-Then this should work (because we need to make $\gamma$ only bigger than the smallest one)
+This formulation should work (because we need to make $\gamma$ only bigger than the smallest one)\newline
+We can try to remove the $\min$ part again by introducing another variable $\omega$.
 We make $\omega$ negative in the objective to penalize it being less than minimum across all $T$
 $$
 \begin{aligned}
@@ -1176,10 +1158,9 @@ $$
 \end{aligned}
 $$
 
-Therefore it could be used, but the objective function would have to be corrected by the value of $\omega$ and in general this formulation is harder to work with.
+Therefore *Worst-period return* could be used, but the objective function would have to be corrected by the value of $\omega$ and in general this formulation is harder to work with.\newline\newline
 
-
-Mean-variance:
+**Mean-variance**:
 $$
 \hat{\sigma}^2 = \sum_i \sum_j x_i x_j \hat{\sigma}_i \hat{\sigma}_j \rho_{ij}
 $$
@@ -1191,23 +1172,27 @@ This would make it a quadratic problem.\newline
 
 ## Subtask 8.e
 
-We can model this feature by adding aditional variable $\theta_j$ what will be binary, indicator-type for $x_j$
+We can model this feature by adding aditional variable $\theta_j \in \left\{\mathbf{0},\mathbf{1}\right\}$ indicator-type for $x_j$.
+We know that upper bound of each $x_j$ is 1 (you cannot spend more than 100% of your resources), $\theta_j$ can be used by introducing a new constraint for each $x_j$:
 
 $$
 \begin{aligned}
-& \max && \sum_{j=1}^{N} c_j x_j \\[2mm]
-& && \sum_{j=1}^{N} x_j \, \widehat{R}_j \ge \alpha + \epsilon (\beta - \alpha), \\[1mm]
-& && \sum_{j=1}^{N} x_j = 1, \\[1mm]
-& && \sum_{j=1}^{N} \theta_j \leq M, \\[1mm]
+& \max && \sum_{j=1}^{N} c_j x_j \\
+& && \sum_{j=1}^{N} x_j \, \hat{R}_j \ge \alpha + \epsilon (\beta - \alpha), \\
+& && \sum_{j=1}^{N} x_j = 1, \\
+& && \sum_{j=1}^{N} \theta_j \leq M, \\
 & && x_j \leq \theta_j \quad j = 1,\dots,N \\\\
-& && x_j \ge 0 \quad j = 1,\dots,N \\
-& &&\theta_j \in \left\{\mathbf{0},\mathbf{1}\right\} \quad j = 1,\dots,N \\
+& &&\mathop{\forall}\limits_{j} x_j  \geq 0 \\
+& &&\mathop{\forall}\limits_{j} \theta_j \in \left\{\mathbf{0},\mathbf{1}\right\} \\
 \end{aligned}
 $$
 
-Here $\theta_j = 0$ makes corresponding $x_j = 0$ and
-$\theta_j = 1$ makes corresponding $x_j \in [0, 1]$ \newline
-Sum of all $\theta_j$ ensures that maximum different assets bought is $\leq M$
+Here for each $x_j$:
+
+- *Not Chosen* : $\theta_j = 0$ makes corresponding $x_j = 0$
+- *Chosen* : $\theta_j = 1$ makes corresponding $x_j \in [0,1]$
+
+Sum of all $\theta_j$ ensures that amount of different assets bought is $\leq M$
 
 \clearpage\newpage
 
@@ -1217,31 +1202,31 @@ We can reuse model from previous task:
 
 $$
 \begin{aligned}
-& \max && \sum_{j=1}^{N} c_j x_j \\[2mm]
-& && \sum_{j=1}^{N} x_j \, \widehat{R}_j \ge \alpha + \epsilon (\beta - \alpha), \\[1mm]
-& && \sum_{j=1}^{N} x_j = 1, \\[1mm]
-& && \sum_{j=1}^{N} \theta_j \leq M, \\[1mm]
+& \max && \sum_{j=1}^{N} c_j x_j \\
+& && \sum_{j=1}^{N} x_j \, \hat{R}_j \ge \alpha + \epsilon (\beta - \alpha), \\
+& && \sum_{j=1}^{N} x_j = 1, \\
+& && \sum_{j=1}^{N} \theta_j \leq M, \\
 & && x_j \leq \theta_j \quad j = 1,\dots,N \\\\
-& && x_j \ge 0 \quad j = 1,\dots,N \\
-& &&\theta_j \in \left\{\mathbf{0},\mathbf{1}\right\} \quad j = 1,\dots,N \\
+& &&\mathop{\forall}\limits_{j} x_j  \geq 0 \\
+& &&\mathop{\forall}\limits_{j} \theta_j \in \left\{\mathbf{0},\mathbf{1}\right\} \\
 \end{aligned}
 $$
 
 By removing maximum different assets constraint and adding a new one with corresponding variable $v$ that will be responsible for minimum $x$ value.
-We can do that by adding another constraint that, when corresponding $\theta_j \neq 0$ will enforce $x_j \in [v, 1]$
+We can do that by adding another constraint that, when corresponding $\theta_j = 1$ will enforce $x_j \in [v, 1]$
 
 $$
 \begin{aligned}
-& \max && \sum_{j=1}^{N} c_j x_j \\[2mm]
-& && \sum_{j=1}^{N} x_j \, \widehat{R}_j \ge \alpha + \epsilon (\beta - \alpha), \\[1mm]
-& && \sum_{j=1}^{N} x_j = 1, \\[1mm]
-& && x_j \leq \theta_j \quad j = 1,\dots,N \\\\
-& && v \cdot  \theta_j \leq x_j \quad j = 1,\dots,N \\\\
-& && x_j \ge 0 \quad j = 1,\dots,N \\
-& &&\theta_j \in \left\{\mathbf{0},\mathbf{1}\right\} \quad j = 1,\dots,N \\
+& \max && \sum_{j=1}^{N} c_j x_j \\\\
+& && \sum_{j=1}^{N} x_j \, \widehat{R}_j \ge \alpha + \epsilon (\beta - \alpha), \\
+& && \sum_{j=1}^{N} x_j = 1, \\
+& && x_j \leq \theta_j \quad j = 1,\dots,N \\
+& && \theta_j v \leq x_j \quad j = 1,\dots,N \\\\
+& &&\mathop{\forall}\limits_{j} x_j  \geq 0 \\
+& &&\mathop{\forall}\limits_{j} \theta_j \in \left\{\mathbf{0},\mathbf{1}\right\} \\
 \end{aligned}
 $$
 
-This ensures that all $x$ stay within bounds.
+This ensures that all $x$ stay within set bounds ${0} \cup [v,1]$.
 
 \clearpage\newpage
