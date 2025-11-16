@@ -975,9 +975,9 @@ $$
 & \min && \frac{1}{T}\sum_{t=1}^T{\tau_t} \\\\
 & && \sum_{j=1}^{N} x_j \, \hat{R}_j \ge \alpha + \epsilon (\beta - \alpha), \\
 & && \sum_{j=1}^{N} x_j = 1, \\\\
-& && \tau_t \geq \sum_{j=1}^N{x_j(r_jt - \hat{R_j})}\quad t = 1,\dots T\\
-& && \tau_t \geq -\sum_{j=1}^N{x_j(r_jt - \hat{R_j})}\quad t = 1,\dots T\\\\
-& && x_j \ge 0, \quad j = 1,\dots,N
+& && \tau_t \geq \sum_{j=1}^N{x_j(r_{jt} - \hat{R_j})}\quad t = 1,\dots T\\
+& && \tau_t \geq -\sum_{j=1}^N{x_j(r_{jt} - \hat{R_j})}\quad t = 1,\dots T\\\\
+& && \mathop{\forall}\limits_{j} x_j \ge 0 \\
 \end{aligned}
 $$
 
@@ -993,9 +993,9 @@ $$
 & \min && \frac{1}{T}\sum_{t=1}^T{\tau_t} \\\\
 & && \sum_{j=1}^{N} x_j \, \hat{R}_j \ge \alpha + \epsilon (\beta - \alpha), \\
 & && \sum_{j=1}^{N} x_j = 1, \\\\
-& && \tau_t \geq \sum_{j=1}^N{x_j(r_jt - \hat{R_j})}\quad t = 1,\dots T\\
-& && \tau_t \geq -\sum_{j=1}^N{x_j(r_jt - \hat{R_j})}\quad t = 1,\dots T\\\\
-& && \mathop{\forall}\limits_{j} x_j \ge \\
+& && \tau_t \geq \sum_{j=1}^N{x_j(r_{jt} - \hat{R_j})}\quad t = 1,\dots T\\
+& && \tau_t \geq -\sum_{j=1}^N{x_j(r_{jt} - \hat{R_j})}\quad t = 1,\dots T\\\\
+& && \mathop{\forall}\limits_{j} x_j \ge 0 \\
 & && \mathop{\forall}\limits_{t} \tau_t \in \mathbb{R}
 \end{aligned}
 $$
@@ -1197,8 +1197,8 @@ $$
 & && \sum_{j=1}^{N} x_j \, \hat{R}_j \ge \alpha + \epsilon (\beta - \alpha), \\
 & && \sum_{j=1}^{N} x_j = 1, \\
 & && \sum_{j=1}^{N} \theta_j \leq M, \\\\
-& && \tau_t \geq \sum_{j=1}^N{x_j(r_jt - \hat{R_j})}\quad t = 1,\dots T\\
-& && \tau_t \geq -\sum_{j=1}^N{x_j(r_jt - \hat{R_j})}\quad t = 1,\dots T\\\\
+& && \tau_t \geq \sum_{j=1}^N{x_j(r_{jt} - \hat{R_j})}\quad t = 1,\dots T\\
+& && \tau_t \geq -\sum_{j=1}^N{x_j(r_{jt} - \hat{R_j})}\quad t = 1,\dots T\\\\
 & && x_j \leq \theta_j \quad j = 1,\dots,N \\\\
 & &&\mathop{\forall}\limits_{j} x_j  \geq 0 \\
 & &&\mathop{\forall}\limits_{j} \theta_j \in \left\{\mathbf{0},\mathbf{1}\right\} \\
@@ -1225,8 +1225,8 @@ $$
 & && \sum_{j=1}^{N} x_j \, \hat{R}_j \ge \alpha + \epsilon (\beta - \alpha), \\
 & && \sum_{j=1}^{N} x_j = 1, \\
 & && \sum_{j=1}^{N} \theta_j \leq M, \\\\
-& && \tau_t \geq \sum_{j=1}^N{x_j(r_jt - \hat{R_j})}\quad t = 1,\dots T\\
-& && \tau_t \geq -\sum_{j=1}^N{x_j(r_jt - \hat{R_j})}\quad t = 1,\dots T\\\\
+& && \tau_t \geq \sum_{j=1}^N{x_j(r_{jt} - \hat{R_j})}\quad t = 1,\dots T\\
+& && \tau_t \geq -\sum_{j=1}^N{x_j(r_{jt} - \hat{R_j})}\quad t = 1,\dots T\\\\
 & && x_j \leq \theta_j \quad j = 1,\dots,N \\\\
 & &&\mathop{\forall}\limits_{j} x_j  \geq 0 \\
 & &&\mathop{\forall}\limits_{j} \theta_j \in \left\{\mathbf{0},\mathbf{1}\right\} \\
@@ -1243,8 +1243,8 @@ $$
 & && \sum_{j=1}^{N} x_j \, \hat{R}_j \ge \alpha + \epsilon (\beta - \alpha), \\
 & && \sum_{j=1}^{N} x_j = 1, \\
 & && \sum_{j=1}^{N} \theta_j \leq M, \\\\
-& && \tau_t \geq \sum_{j=1}^N{x_j(r_jt - \hat{R_j})}\quad t = 1,\dots T\\
-& && \tau_t \geq -\sum_{j=1}^N{x_j(r_jt - \hat{R_j})}\quad t = 1,\dots T\\\\
+& && \tau_t \geq \sum_{j=1}^N{x_j(r_{jt} - \hat{R_j})}\quad t = 1,\dots T\\
+& && \tau_t \geq -\sum_{j=1}^N{x_j(r_{jt} - \hat{R_j})}\quad t = 1,\dots T\\\\
 & && x_j \leq \theta_j \quad j = 1,\dots,N \\\\
 & && \theta_j v \leq x_j \quad j = 1,\dots,N \\\\
 & &&\mathop{\forall}\limits_{j} x_j  \geq 0 \\
