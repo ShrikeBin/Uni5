@@ -958,16 +958,23 @@ $$
 \hat{R_j} &= \frac{1}{T} \sum_{t=1}^T{r_{jt}}\\\\
 \alpha &= \max\Big( 0, \min_j \hat{R}_j \Big)\\\\
 \beta &= \max_j \hat{R}_j\\\\
+B &=\alpha + \epsilon (\beta - \alpha)=\\
+&= \text{minimal reward}\\\\
 \hat{R} &= \sum_{j=1}^N{x_jR_{j}} =\\
 &= \text{reward}\\\\
 \widehat{\text{MAD}} &= \frac{1}{T}\sum_{t=1}^T{\left[\left|\sum_{j=1}^N{x_j(r_jt - \hat{R_j})}\right|\right]}\\
+&\downarrow\text{  (not a formal equality, just notation)}\\
+&=\frac{1}{T}\sum_{t=1}^T{\tau_t}\\
 &= \text{risk}\\\\
+\tau_t &\approx \left|\sum_{j=1}^N{x_j(r_jt - \hat{R_j})}\right|\\
+&=\text{auxiliary variable to remove}\\
+&\text{absolute value from the formulation}
 \end{aligned}
 \end{matrix}
 $$
 
 \newpage
-We want to replace the absolute value with something more linear, let's introduce a set of additional variables responisble for that, $\tau_t$
+We want to replace the absolute value with something more linear, let's introduce a set of additional variables responisble for that, $\tau_t$, and 2 succesive inequalities for each, to make up for the possible negativity before applying absolute value.
 Assuming that all the fractions have to sum up to 1, i.e. we *have to* invest all of our resources, the model is as follows:
 
 $$
@@ -980,6 +987,14 @@ $$
 & && \mathop{\forall}\limits_{j} x_j \ge 0 \\
 \end{aligned}
 $$
+
+Explained line by line:
+
+- minimization of risk denoted by $\widehat{MAD}$
+- constraint on the reward $\geq$ minimal reward $B$
+- constraint on full investement 
+- 2 sets of constraints replacing absolute value, There is combined $2T$ of them, 2 constraints for each $\tau_t$
+- general bounds on $x_j$
 
 
 \clearpage\newpage
@@ -1000,7 +1015,7 @@ $$
 \end{aligned}
 $$
 
-Has exactly $2N$ variables and $2N + 2$ (or $3N+2$ if we include $x_j \geq 0$) constraints
+Has exactly $N+T$ variables and $2T + 2$ (or $2T + N +2$ if we include $x_j \geq 0$) constraints
 \clearpage\newpage
 
 ## Subtask 8.c 
@@ -1206,7 +1221,7 @@ $$
 \end{aligned}
 $$
 
-Here for each $x_j$:
+Here for each $x_j$, $\theta_j$ can be called a *choosing* variable for asset $j$:
 
 - *Not Chosen* : $\theta_j = 0$ makes corresponding $x_j = 0$
 - *Chosen* : $\theta_j = 1$ makes corresponding $x_j \in [0,1]$
