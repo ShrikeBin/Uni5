@@ -1,0 +1,6 @@
+[line 3] Error: Type Error at 'add': Operands must be both numbers. Got: BOOL and NUMBER.
+[line 6] Error: Type Error at 'if': Condition should be a boolean. Got: STRING.
+[line 7] Error: Type Error at 'd': Cannot assign NUMBER to STRING.
+[line 10] Error: Type Error at 'e': Cannot assign BOOL to STRING.
+[line 13] Error: Type Error at 'EQUALS': Operands must be both numbers or booleans. Got: NUMBER and BOOL.
+[line 15] Error: Type Error at 'x': Cannot assign BOOL to NUMBER.

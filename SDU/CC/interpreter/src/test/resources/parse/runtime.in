@@ -1,0 +1,13 @@
+function fact(x has_type Number) has_type Number {
+    if(x LESS_EQUAL 0)
+    {
+        return 1;
+    }
+    else
+    {
+        return multiply(x fact(subtract(x 1)));
+    }
+}
+
+write_to_console fact(10);
+write_to_console divide(10 0);

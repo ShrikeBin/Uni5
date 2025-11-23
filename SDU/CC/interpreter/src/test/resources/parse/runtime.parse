@@ -1,0 +1,45 @@
+Program
+├── FunDecl
+│   ├── fact
+│   ├── Param
+│   │   ├── x
+│   │   └── Number
+│   ├── Number
+│   └── BlockStmt
+│       └── IfStmt
+│           ├── BinaryExpr
+│           │   ├── VariableExpr
+│           │   │   └── x
+│           │   ├── LESS_EQUAL
+│           │   └── LiteralExpr
+│           │       └── 0
+│           ├── BlockStmt
+│           │   └── ReturnStmt
+│           │       └── LiteralExpr
+│           │           └── 1
+│           └── BlockStmt
+│               └── ReturnStmt
+│                   └── BinaryExpr
+│                       ├── VariableExpr
+│                       │   └── x
+│                       ├── multiply
+│                       └── CallExpr
+│                           ├── fact
+│                           └── BinaryExpr
+│                               ├── VariableExpr
+│                               │   └── x
+│                               ├── subtract
+│                               └── LiteralExpr
+│                                   └── 1
+├── PrintStmt
+│   └── CallExpr
+│       ├── fact
+│       └── LiteralExpr
+│           └── 10
+└── PrintStmt
+    └── BinaryExpr
+        ├── LiteralExpr
+        │   └── 10
+        ├── divide
+        └── LiteralExpr
+            └── 0

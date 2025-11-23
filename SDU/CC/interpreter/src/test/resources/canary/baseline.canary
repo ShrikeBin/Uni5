@@ -1,0 +1,2 @@
+[line 10] Error: Type Error at '_only_declared': No initializer.
+[line 41] Error: Type Error at 'EQUALS': Operands must be both numbers or booleans. Got: NUMBER and STRING.

@@ -1,0 +1,21 @@
+# Input
+variable n has_type Number is 50;
+write_to_console cast_to String (n);
+write_to_console factorial(n);
+
+
+function factorial(n has_type Number) has_type Number 
+{
+    if (n LESS 0 ) 
+    {
+       return -1;
+    }
+    if (n LESS_EQUAL 1)
+    {
+        return n;
+    }
+    else 
+    {
+        return multiply(n factorial(subtract(n 1)));
+    }
+}

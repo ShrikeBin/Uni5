@@ -1,0 +1,8 @@
+[line 3] Error: Parse error at 'is': Expected variable type.
+[line 4] Error: Parse error at '1': Expected variable name.
+[line 6] Error: Parse error at 'false': Expected ';' after expression.
+[line 9] Error: Parse error at ';': Expected expression.
+[line 10] Error: Parse error at 'of_type': Expected 'has_type'.
+[line 14] Error: Parse error at ')': Expected expression.
+[line 18] Error: Parse error at 'String': Expected 'has_type'.
+[line 21] Error: Parse error at 'else': Expected expression.

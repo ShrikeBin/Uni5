@@ -1,0 +1,117 @@
+Program
+├── FunDecl
+│   ├── f
+│   └── BlockStmt
+│       ├── VarDecl
+│       │   ├── h
+│       │   ├── Bool
+│       │   └── LiteralExpr
+│       │       └── true
+│       ├── VarDecl
+│       │   ├── z
+│       │   ├── String
+│       │   └── LiteralExpr
+│       │       └── "Hello World"
+│       ├── FunDecl
+│       │   ├── g
+│       │   └── BlockStmt
+│       │       └── PrintStmt
+│       │           └── VariableExpr
+│       │               └── z
+│       └── IfStmt
+│           ├── LiteralExpr
+│           │   └── true
+│           ├── BlockStmt
+│           │   └── ReturnStmt
+│           │       └── VOID
+│           └── BlockStmt
+│               ├── ReturnStmt
+│               │   └── LiteralExpr
+│               │       └── 1
+│               └── PrintStmt
+│                   └── LiteralExpr
+│                       └── "Unreachable code?"
+├── ExprStmt
+│   └── CallExpr
+│       ├── g
+│       └── VariableExpr
+│           └── x
+├── VarDecl
+│   ├── x
+│   ├── Number
+│   └── LiteralExpr
+│       └── 0.0
+├── ExprStmt
+│   └── CallExpr
+│       ├── g
+│       └── VariableExpr
+│           └── x
+├── ExprStmt
+│   └── CallExpr
+│       ├── f
+│       └── VariableExpr
+│           └── x
+├── BlockStmt
+│   ├── BlockStmt
+│   │   └── FunDecl
+│   │       ├── h
+│   │       ├── Param
+│   │       │   ├── x
+│   │       │   └── String
+│   │       └── BlockStmt
+│   │           └── PrintStmt
+│   │               └── VariableExpr
+│   │                   └── x
+│   ├── IfStmt
+│   │   ├── VariableExpr
+│   │   │   └── x
+│   │   ├── BlockStmt
+│   │   │   ├── VarDecl
+│   │   │   │   ├── y
+│   │   │   │   ├── Bool
+│   │   │   │   └── LogicalExpr
+│   │   │   │       ├── CastExpr
+│   │   │   │       │   ├── Bool
+│   │   │   │       │   └── VariableExpr
+│   │   │   │       │       └── x
+│   │   │   │       ├── AND
+│   │   │   │       └── CallExpr
+│   │   │   │           ├── h
+│   │   │   │           └── VariableExpr
+│   │   │   │               └── f
+│   │   │   └── ExprStmt
+│   │   │       └── LogicalExpr
+│   │   │           ├── LiteralExpr
+│   │   │           │   └── false
+│   │   │           ├── OR
+│   │   │           └── VariableExpr
+│   │   │               └── y
+│   │   └── BlockStmt
+│   │       └── ExprStmt
+│   │           └── AssignExpr
+│   │               ├── y
+│   │               └── LiteralExpr
+│   │                   └── "Hello"
+│   ├── ExprStmt
+│   │   └── CastExpr
+│   │       ├── Bool
+│   │       └── LiteralExpr
+│   │           └── "Hello"
+│   ├── ExprStmt
+│   │   └── AssignExpr
+│   │       ├── x
+│   │       └── CallExpr
+│   │           └── f
+│   └── PrintStmt
+│       └── VariableExpr
+│           └── y
+└── FunDecl
+    ├── h
+    ├── Param
+    │   ├── y
+    │   └── String
+    ├── Bool
+    └── BlockStmt
+        └── ReturnStmt
+            └── LiteralExpr
+                └── true

@@ -1,0 +1,4 @@
+[line 1] Error: Parse error at 'EQUA': Expected ';' after variable declaration.
+[line 4] Error: Parse error at '1': Expected '(' after operator.
+[line 6] Error: Parse error at ';': Expected ')' after operator.
+[line 7] Error: Parse error at ',': Expected expression.

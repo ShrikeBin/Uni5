@@ -1,0 +1,8 @@
+[line 2] Error: Scope Error at 'a': Variable not defined.
+[line 8] Error: Scope Error at 'x': Variable not defined.
+[line 9] Error: Scope Error at 'x': Variable not defined.
+[line 13] Error: Scope Error at 'a': Redeclaration of variable.
+[line 14] Error: Scope Error at 'a': Redeclaration of variable.
+[line 14] Error: Type Error at 'a': Cannot assign NUMBER to STRING.
+[line 18] Error: Scope Error at 'a': Redeclaration of variable.
+[line 21] Error: Scope Error at 'a': Redeclaration of variable.

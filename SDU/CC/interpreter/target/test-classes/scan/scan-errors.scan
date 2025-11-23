@@ -1,0 +1,4 @@
+[line 2] Error: Scan error at '=': Unexpected character: 
+[line 3] Error: Scan error at '': Strings cannot span more than one line.
+[line 7] Error: Scan error at '<': Unexpected character: 
+[line 8] Error: Scan error at '$': Unexpected character:

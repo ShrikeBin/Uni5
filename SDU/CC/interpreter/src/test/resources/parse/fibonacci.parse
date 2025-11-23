@@ -1,0 +1,143 @@
+Program
+├── FunDecl
+│   ├── fibIterative
+│   ├── Param
+│   │   ├── n
+│   │   └── Number
+│   ├── Number
+│   └── BlockStmt
+│       ├── PrintStmt
+│       │   └── LiteralExpr
+│       │       └── "start iteration"
+│       ├── VarDecl
+│       │   ├── a
+│       │   ├── Number
+│       │   └── LiteralExpr
+│       │       └── 0
+│       ├── VarDecl
+│       │   ├── b
+│       │   ├── Number
+│       │   └── LiteralExpr
+│       │       └── 1
+│       ├── VarDecl
+│       │   ├── i
+│       │   ├── Number
+│       │   └── LiteralExpr
+│       │       └── 1
+│       ├── WhileStmt
+│       │   ├── BinaryExpr
+│       │   │   ├── VariableExpr
+│       │   │   │   └── i
+│       │   │   ├── LESS
+│       │   │   └── VariableExpr
+│       │   │       └── n
+│       │   └── BlockStmt
+│       │       ├── VarDecl
+│       │       │   ├── next
+│       │       │   ├── Number
+│       │       │   └── BinaryExpr
+│       │       │       ├── VariableExpr
+│       │       │       │   └── a
+│       │       │       ├── add
+│       │       │       └── VariableExpr
+│       │       │           └── b
+│       │       ├── ExprStmt
+│       │       │   └── AssignExpr
+│       │       │       ├── a
+│       │       │       └── VariableExpr
+│       │       │           └── b
+│       │       ├── ExprStmt
+│       │       │   └── AssignExpr
+│       │       │       ├── b
+│       │       │       └── VariableExpr
+│       │       │           └── next
+│       │       └── ExprStmt
+│       │           └── AssignExpr
+│       │               ├── i
+│       │               └── BinaryExpr
+│       │                   ├── VariableExpr
+│       │                   │   └── i
+│       │                   ├── add
+│       │                   └── LiteralExpr
+│       │                       └── 1
+│       ├── PrintStmt
+│       │   └── LiteralExpr
+│       │       └── "ended iteration"
+│       └── ReturnStmt
+│           └── VariableExpr
+│               └── b
+├── VarDecl
+│   ├── counter
+│   ├── Number
+│   └── LiteralExpr
+│       └── 1
+├── FunDecl
+│   ├── fibRecursive
+│   ├── Param
+│   │   ├── n
+│   │   └── Number
+│   ├── Number
+│   └── BlockStmt
+│       ├── IfStmt
+│       │   ├── BinaryExpr
+│       │   │   ├── VariableExpr
+│       │   │   │   └── n
+│       │   │   ├── LESS
+│       │   │   └── LiteralExpr
+│       │   │       └── 0
+│       │   └── BlockStmt
+│       │       └── ReturnStmt
+│       │           └── UnaryExpr
+│       │               ├── -
+│       │               └── LiteralExpr
+│       │                   └── 1
+│       └── IfStmt
+│           ├── BinaryExpr
+│           │   ├── VariableExpr
+│           │   │   └── n
+│           │   ├── LESS_EQUAL
+│           │   └── LiteralExpr
+│           │       └── 1
+│           ├── BlockStmt
+│           │   └── ReturnStmt
+│           │       └── VariableExpr
+│           │           └── n
+│           └── BlockStmt
+│               └── ReturnStmt
+│                   └── BinaryExpr
+│                       ├── CallExpr
+│                       │   ├── fibRecursive
+│                       │   └── BinaryExpr
+│                       │       ├── VariableExpr
+│                       │       │   └── n
+│                       │       ├── subtract
+│                       │       └── LiteralExpr
+│                       │           └── 1
+│                       ├── add
+│                       └── CallExpr
+│                           ├── fibRecursive
+│                           └── BinaryExpr
+│                               ├── VariableExpr
+│                               │   └── n
+│                               ├── subtract
+│                               └── LiteralExpr
+│                                   └── 2
+├── VarDecl
+│   ├── n
+│   ├── Number
+│   └── LiteralExpr
+│       └── 10
+├── PrintStmt
+│   └── CastExpr
+│       ├── String
+│       └── CallExpr
+│           ├── fibIterative
+│           └── VariableExpr
+│               └── n
+└── PrintStmt
+    └── CastExpr
+        ├── String
+        └── CallExpr
+            ├── fibRecursive
+            └── VariableExpr
+                └── n

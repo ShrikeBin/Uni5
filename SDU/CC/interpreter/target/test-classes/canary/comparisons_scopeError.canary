@@ -1,0 +1,3 @@
+[line 7] Error: Scope Error at 'a': Variable not defined.
+[line 11] Error: Scope Error at 'number1': Variable not defined.
+[line 11] Error: Scope Error at 'number2': Variable not defined.

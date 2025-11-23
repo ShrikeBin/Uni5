@@ -1,0 +1,61 @@
+Program
+├── VarDecl
+│   ├── n
+│   ├── Number
+│   └── LiteralExpr
+│       └── 50
+├── PrintStmt
+│   └── CastExpr
+│       ├── String
+│       └── VariableExpr
+│           └── n
+├── PrintStmt
+│   └── CallExpr
+│       ├── factorial
+│       └── VariableExpr
+│           └── n
+└── FunDecl
+    ├── factorial
+    ├── Param
+    │   ├── n
+    │   └── Number
+    ├── Number
+    └── BlockStmt
+        ├── IfStmt
+        │   ├── BinaryExpr
+        │   │   ├── VariableExpr
+        │   │   │   └── n
+        │   │   ├── LESS
+        │   │   └── LiteralExpr
+        │   │       └── 0
+        │   └── BlockStmt
+        │       └── ReturnStmt
+        │           └── UnaryExpr
+        │               ├── -
+        │               └── LiteralExpr
+        │                   └── 1
+        └── IfStmt
+            ├── BinaryExpr
+            │   ├── VariableExpr
+            │   │   └── n
+            │   ├── LESS_EQUAL
+            │   └── LiteralExpr
+            │       └── 1
+            ├── BlockStmt
+            │   └── ReturnStmt
+            │       └── VariableExpr
+            │           └── n
+            └── BlockStmt
+                └── ReturnStmt
+                    └── BinaryExpr
+                        ├── VariableExpr
+                        │   └── n
+                        ├── multiply
+                        └── CallExpr
+                            ├── factorial
+                            └── BinaryExpr
+                                ├── VariableExpr
+                                │   └── n
+                                ├── subtract
+                                └── LiteralExpr
+                                    └── 1

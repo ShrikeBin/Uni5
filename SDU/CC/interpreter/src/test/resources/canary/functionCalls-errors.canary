@@ -1,0 +1,7 @@
+[line 6] Error: Type Error at 'x': Cannot assign NUMBER to STRING.
+[line 12] Error: Type Error at 'numberParam': Wrong arguments. Expected: [NUMBER], got: [STRING].
+[line 18] Error: Type Error at 'numberParam2': Wrong arguments. Expected: [NUMBER], got: [BOOL].
+[line 25] Error: Type Error at 'boolParam': Wrong arguments. Expected: [BOOL], got: [STRING].
+[line 26] Error: Type Error at 'boolParam': Wrong arguments. Expected: [BOOL], got: [NUMBER].
+[line 31] Error: Type Error at 'stringParam': Wrong arguments. Expected: [STRING], got: [BOOL].
+[line 32] Error: Type Error at 'stringParam': Wrong arguments. Expected: [STRING], got: [NUMBER].

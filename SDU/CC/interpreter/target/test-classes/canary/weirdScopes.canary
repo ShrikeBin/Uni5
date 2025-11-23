@@ -1,0 +1,17 @@
+[line 2] Error: Scope Error at 'h': Redeclaration of variable.
+[line 5] Error: Scope Error at 'g': Cannot define a function in a non-global scope.
+[line 6] Error: Scope Error at 'z': Variable not defined.
+[line 12] Error: Type Error at 'return': Wrong return type. Expected: VOID, got: NUMBER.
+[line 12] Error: Type Error at 'return': Unreachable code after return statement.
+[line 17] Error: Scope Error at 'g': Function not defined
+[line 17] Error: Scope Error at 'x': Variable not defined.
+[line 21] Error: Scope Error at 'g': Function not defined
+[line 23] Error: Type Error at 'f': Wrong arguments. Expected: [], got: [NUMBER].
+[line 27] Error: Scope Error at 'h': Cannot define a function in a non-global scope.
+[line 32] Error: Type Error at 'if': Condition should be a boolean. Got: NUMBER.
+[line 33] Error: Type Error at 'f': f is not a variable.
+[line 34] Error: Scope Error at 'y': Variable not defined.
+[line 36] Error: Scope Error at 'y': Variable not defined.
+[line 39] Error: Type Error at 'Bool': Cannot cast STRING as BOOL.
+[line 40] Error: Type Error at 'x': Cannot assign VOID to NUMBER.
+[line 41] Error: Scope Error at 'y': Variable not defined.
