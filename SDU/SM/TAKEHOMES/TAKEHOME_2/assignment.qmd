@@ -1,0 +1,172 @@
+---
+title: "Take Home Assignment 1"
+author: "Jan Ryszkiewicz"
+format: pdf
+mainfont: Latin Modern Roman
+sansfont: Latin Modern Roman
+---
+
+# Task 1
+
+## subtask 1
+
+### a)
+```{r, fig.width=18, fig.height=18}
+load("Data_Assignment2_Ex1_E2025.rdata")
+df <- cgm_data
+summary(df[, sapply(df, is.numeric)])
+table(df$adhesive_type)
+```
+
+### b)
+
+```{r}
+library(ggplot2)
+numeric_vars <- c("skin_temp", "humidity", "activity_level",
+                  "sweat_rate", "calibration_error", "patient_bmi", "experience")
+
+for (var in numeric_vars) {
+  p <- ggplot(df, aes(x = .data[[var]], y = lifetime)) +
+    geom_point(size = 2, alpha = 0.7) +
+    geom_smooth(method = "lm", se = FALSE, color = "red") +
+    theme_minimal() +
+    labs(title = paste("Lifetime vs", var),
+         x = var,
+         y = "Lifetime")
+  print(p)
+}
+
+ggplot(df, aes(x = adhesive_type, y = lifetime)) +
+  geom_boxplot(fill = "red") +
+  theme_minimal() +
+  labs(title = "Sensor Lifetime by Adhesive Type")
+
+```
+
+## subtask 2
+
+### a) , b), c)
+```{r}
+df$adhesive_type <- as.factor(df$adhesive_type)
+
+gamma_model_log <- glm(lifetime ~ skin_temp + humidity + activity_level +
+                     sweat_rate + calibration_error + patient_bmi +
+                     experience + adhesive_type,
+                   data = df,
+                   family = Gamma(link = "log"))
+gamma_model_canon <- glm(lifetime ~ skin_temp + humidity + activity_level +
+                         sweat_rate + calibration_error + patient_bmi +
+                         experience + adhesive_type,
+                       data = df,
+                       family = Gamma(link = "inverse"))
+inv_gauss_model_log <- glm(lifetime ~ skin_temp + humidity + activity_level +
+                         sweat_rate + calibration_error + patient_bmi +
+                         experience + adhesive_type,
+                       data = df,
+                       family = inverse.gaussian(link = "log"))
+models <- list(
+  Gamma_Log = gamma_model_log,
+  Gamma_Canonical= gamma_model_canon,
+  Inv_Gaussian_Log = inv_gauss_model_log
+)
+
+for (name in names(models)) {
+  print(summary(models[[name]]))
+}
+
+aic_values <- sapply(models, AIC)
+print(sort(aic_values))
+
+resid_dev <- sapply(models, function(m) if("deviance" %in% names(m)) m$deviance else NA)
+print(sort(resid_dev))
+```
+
+Data is strictly positive so potantially we should use Gamma or Inverse Gaussian.
+Tried fitting models with canonical links (had trouble with inverse so just fitted with log) and compared
+Best performing was LogGamma and thats what im going to use. Inverse gausian doesnt see mto be necessary with its $\mu^3$
+
+### d), e)
+
+```{r}
+cat("\n=== Stepwise selection for Gamma_Log ===\n")
+best_model <- step(gamma_model_log)
+summary(best_model)
+
+cat("\n=== P value selection for Gamma_Log ===\n")
+alt_best_model <- glm(lifetime ~ skin_temp + humidity + activity_level +
+                     calibration_error + adhesive_type,
+                   data = df,
+                   family = Gamma(link = "log"))
+summary(alt_best_model)
+
+anova(best_model, alt_best_model)
+
+final_model = alt_best_model
+```
+
+We tried stepwise model selection based on Akaike Information Criterion and selection based on p values (noted that we do not remove interaction terms as at least one of them has a very low p value)
+We end up with two models, fortunatly different in one predictor, we compare them using anova() command and choose the simpler alternative best model that doesnt include bmi predictor as it unnecessary
+
+## subtask 3
+
+Our final model is of Gamma kind with log link function
+
+### a)
+
+```{r}
+final_model <- glm(lifetime ~ skin_temp + humidity + activity_level +
+                   calibration_error + adhesive_type,
+                   data = df,
+                   family = Gamma(link = "log"))
+summary_table <- summary(final_model)$coefficients
+round(summary_table, 4)
+```
+
+### b)
+```{r}
+mean_skin_temp <- mean(df$skin_temp)
+mean_humidity <- mean(df$humidity)
+mean_cal_error <- mean(df$calibration_error)
+
+# adhesive A most prelevant so chose it
+# BMI is not present in my final model
+eta <- coef(final_model)["(Intercept)"] +
+       coef(final_model)["skin_temp"]*mean_skin_temp +
+       coef(final_model)["humidity"]*mean_humidity +
+       coef(final_model)["activity_level"]*4 +
+       coef(final_model)["calibration_error"]*mean_cal_error
+
+fitted_value <- exp(eta)
+fitted_value
+```
+
+### c)
+
+**YEAH MAKE PLOTS**
+
+### d)
+```{r}
+deviance(final_model)
+AIC(final_model)
+```
+
+### e)
+```{r}
+summary(final_model)$dispersion
+```
+this indicates underdispersion, could follow potentially with quasiGamma to fix it but underdispersion seems fine (not as bad as overdispersion, the fit is good)
+
+### f)
+
+**DO THAT ANALYSIS THO**
+User experience is not important and was removed from the final model
+
+# Task 2
+
+```{r, fig.width=18, fig.height=18}
+load("Data_Assignment2_Ex2_E2025.rdata")
+df_x <- x
+df_y <- Y
+str(df_x)
+str(df_y)
+```
