@@ -1,0 +1,98 @@
+\usepackage[utf8]{inputenc}
+\usepackage[danish,english]{babel}
+\usepackage{graphicx}
+\usepackage[a4paper,margin=1cm]{geometry}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{enumerate}
+\usepackage{array}
+
+\usepackage{tikz}
+\usetikzlibrary{arrows,decorations.pathmorphing,backgrounds,positioning,fit,matrix}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{2ex} 
+
+\renewcommand{\vec}[1]{\ensuremath {\mathbf #1}}
+\newcommand{\coursename}{Statistical Modelling}
+\newcommand{\term}{Winter 2025}
+\newcommand{\dept}{Department of Mathematics and Computer Science}
+\newcommand{\nextpart}{
+  \vspace{-0.2cm}
+  \noindent\rule{\linewidth}{1pt}
+  \vspace{-0.4cm}}
+\newcommand{\nexttask}{
+  \vspace{-0.2cm}
+  \noindent\rule{\linewidth}{1pt}
+  \vspace{-0.1cm}
+  \noindent\rule{\linewidth}{1pt}
+  \vspace{-0.4cm}}
+\newcommand{\upOne}{\vspace{-1.0cm}}
+\newcommand{\upHalf}{\vspace{-0.5cm}}
+\newcommand{\codePrintStart}{\begin{OutputBox}}
+\newcommand{\codePrintEnd}{\end{OutputBox}}
+
+
+\author{jarys25}
+\newcommand{\courseid}{ST523}
+\makeatletter
+\let\runauthor\@author
+\let\runtitle\@title
+\makeatother
+
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\usepackage{listings}
+\lstset{
+  backgroundcolor=\color{gray!15},
+  frame=single,
+  framerule=0.5pt,
+  basicstyle=\ttfamily,
+  breaklines=true
+}
+
+\usepackage{xcolor}
+\usepackage{framed}
+
+% Define a shaded environment for code output
+\definecolor{outputbg}{gray}{0.9} % light gray
+
+\newenvironment{OutputBox}
+  {\begin{snugshade}\vspace{0.2em}}
+  {\end{snugshade}}
+
+
+
+
+\setlength{\headheight}{30pt}  % or more if needed
+\pagestyle{fancy}
+\lhead{{\courseid -- \term }} 
+\chead{}
+\rhead{Ex.~nr.~\runauthor}
+\cfoot{Page \thepage\ of \pageref{LastPage}}
+
+\fancypagestyle{plain}{
+\vspace{4ex}
+\lhead{\dept\\
+University of Southern Denmark, Odense}
+\chead{}
+\rhead{\today\\
+\runauthor}
+\lfoot{}
+\rfoot{}
+}
+
+
+\title{\begin{flushleft}
+\vspace{-4ex}
+\courseid~-- \coursename \\[0.2cm]
+{\Large Answers to the Take-home 2 Assignment, \term \\
+\hrule}
+\end{flushleft}
+\vspace{-4ex}
+}
+
+
+\date{}
+
+

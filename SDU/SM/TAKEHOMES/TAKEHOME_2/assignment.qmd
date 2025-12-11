@@ -1,52 +1,77 @@
 ---
-title: "Take Home Assignment 1"
-author: "Jan Ryszkiewicz"
-format: pdf
-mainfont: Latin Modern Roman
-sansfont: Latin Modern Roman
+format:
+    pdf:
+        include-in-header: "template_answers.tex"
+mainfont: STIX Two Text
+sansfont: STIX Two Text
+mathfont: Latin Modern Math
 ---
+\maketitle
 
+\upOne
 # Task 1
 
 ## subtask 1
 
-### a)
+The dataset contains 113 observations across 9 variables. Summary statistics are presented below:
+
+\upHalf
+\codePrintStart
 ```{r, fig.width=18, fig.height=18}
+#| echo: false
+#| message: false
+#| warning: false
 load("Data_Assignment2_Ex1_E2025.rdata")
 df <- cgm_data
-summary(df[, sapply(df, is.numeric)])
-table(df$adhesive_type)
+print(summary(df[, sapply(df, is.numeric)]))
 ```
+\codePrintEnd
 
-### b)
+For the adhesive, as it is a factor variable, we only show the overall amount of data entries per type:
 
+\upHalf
+\codePrintStart
 ```{r}
-library(ggplot2)
-numeric_vars <- c("skin_temp", "humidity", "activity_level",
-                  "sweat_rate", "calibration_error", "patient_bmi", "experience")
-
-for (var in numeric_vars) {
-  p <- ggplot(df, aes(x = .data[[var]], y = lifetime)) +
-    geom_point(size = 2, alpha = 0.7) +
-    geom_smooth(method = "lm", se = FALSE, color = "red") +
-    theme_minimal() +
-    labs(title = paste("Lifetime vs", var),
-         x = var,
-         y = "Lifetime")
-  print(p)
-}
-
-ggplot(df, aes(x = adhesive_type, y = lifetime)) +
-  geom_boxplot(fill = "red") +
-  theme_minimal() +
-  labs(title = "Sensor Lifetime by Adhesive Type")
-
+#| echo: false
+#| message: false
+#| warning: false
+print(table(df$adhesive_type))
 ```
+\codePrintEnd
+\nextpart
+
+Relationship with Lifetime plots:
+
+![](plots/Lifetime_vs_activity_level.png){width=50%}![](plots/Lifetime_vs_adhesive_type.png){width=50%}
+![](plots/Lifetime_vs_calibration_error.png){width=50%}![](plots/Lifetime_vs_experience.png){width=50%}
+![](plots/Lifetime_vs_humidity.png){width=50%}![](plots/Lifetime_vs_patient_bmi.png){width=50%}
+![](plots/Lifetime_vs_skin_temp.png){width=50%}![](plots/Lifetime_vs_sweat_rate.png){width=50%}
+
+It is worth noting that on the plots we can see 4 points which significantly higher lifetime stands out from the rest
+
+\nexttask
 
 ## subtask 2
 
-### a) , b), c)
+Since lifetime is strictly positive and continuous, I considered two GLM families:
+
+- Gamma distribution with log and canonical (inverse) links
+
+- Inverse Gaussian distribution with log link
+
+Log link function is chosen as the relationship between lifetime and humidity seems exponential - other continuous predictors appear linear on the plots.
+The canonical link for Inverse Gaussian caused convergence issues, so it was excluded.
+
+I do not consider Poisson distribution as it is designed for count data, not continuous responses. 
+Binomial on the other hand is mainly used for proportion data which is not present in our example.
+
+We compare candidate models based on AIC:
+
+\codePrintStart
 ```{r}
+#| echo: false
+#| message: false
+#| warning: false
 df$adhesive_type <- as.factor(df$adhesive_type)
 
 gamma_model_log <- glm(lifetime ~ skin_temp + humidity + activity_level +
@@ -70,96 +95,188 @@ models <- list(
   Inv_Gaussian_Log = inv_gauss_model_log
 )
 
-for (name in names(models)) {
-  print(summary(models[[name]]))
-}
-
 aic_values <- sapply(models, AIC)
 print(sort(aic_values))
+```
+\codePrintEnd
+\upHalf
+and residual deviance:
 
+\codePrintStart
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
 resid_dev <- sapply(models, function(m) if("deviance" %in% names(m)) m$deviance else NA)
 print(sort(resid_dev))
 ```
+\codePrintEnd
 
-Data is strictly positive so potantially we should use Gamma or Inverse Gaussian.
-Tried fitting models with canonical links (had trouble with inverse so just fitted with log) and compared
-Best performing was LogGamma and thats what im going to use. Inverse gausian doesnt see mto be necessary with its $\mu^3$
+The Gamma distribution with log linking was selected based on lowest AIC. Even though Inverse Gaussian had slightly lower residual deviance, the substantial AIC difference ($\Delta \approx 80$) and the excessive cubic mean-variance relationship ($\mu^3$) were not necessary given the visually observed variance structure on the plots.
+It is worth bearing in mind the existance of cathegorical predictor in the model - `adhesive_type` - during the model selectio the p-value is low enough to consider it statistically significant.
 
-### d), e)
+Full fit model can be tested for interaction using `(...)^2` syntax, I performed sensible pairwise tests for the predictors including their interaction terms, ie. relating `activity_level` to, for instance, `patient_bmi`, `sweat_rate` and `humidity`, relating `experience:humidity` or `experience:calibration_error` etc, yielded no statistically significant interaction terms between the predictors (their p-values were > 0.05)
 
+
+\nextpart
+
+We consider 2 different predictor selection methods:
+
+- Stepwise, based on AIC using `step()`:
 ```{r}
-cat("\n=== Stepwise selection for Gamma_Log ===\n")
-best_model <- step(gamma_model_log)
-summary(best_model)
+#| message: false
+#| warning: false
+Model_1 <- step(gamma_model_log, trace=0)
+```
 
-cat("\n=== P value selection for Gamma_Log ===\n")
-alt_best_model <- glm(lifetime ~ skin_temp + humidity + activity_level +
+- P-value based selection (threshold: p > 0.05):
+
+\codePrintStart
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+round(summary(glm(lifetime ~ skin_temp + humidity + activity_level +
+                     sweat_rate + calibration_error + patient_bmi +
+                     experience + adhesive_type,
+                   data = df,
+                   family = Gamma(link = "log")))$coefficients, 5)
+Model_2 <- glm(lifetime ~ skin_temp + humidity + activity_level +
                      calibration_error + adhesive_type,
                    data = df,
                    family = Gamma(link = "log"))
-summary(alt_best_model)
-
-anova(best_model, alt_best_model)
-
-final_model = alt_best_model
+# summary(alt_best_model)
 ```
+\codePrintEnd
 
-We tried stepwise model selection based on Akaike Information Criterion and selection based on p values (noted that we do not remove interaction terms as at least one of them has a very low p value)
-We end up with two models, fortunatly different in one predictor, we compare them using anova() command and choose the simpler alternative best model that doesnt include bmi predictor as it unnecessary
+Initial full model coefficients were deemed:
+
+- Significant (p < 0.05): humidity, calibration_error, skin_temp, activity_level
+- Non-significant : sweat_rate (p=0.545), experience (p=0.574), patient_bmi (p=0.187)
+- Adhesive type C showed significance (p=0.022), therefore all cathegorical predictors of `adhesive_type` retained.
+
+\nextpart
+
+Comparison between two models:
+
+- Model 1 - step() best.
+- Model 2 - p-value based choice.
+
+\codePrintStart
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+print(anova(Model_1, Model_2))
+
+final_model = Model_2
+```
+\codePrintEnd
+
+After the stepwise model selection based on Akaike Information Criterion and selection based on p values. We end up with two models, different in one predictor - patient_bmi. We perform `anova()` test in order to choose one of them.
+
+The comparison shows insignificant difference in residual deviance therefore Model 2 is selected following parsimony principle - patient_bmi does not significantly improve the fit.
+
+\nexttask
 
 ## subtask 3
 
-Our final model is of Gamma kind with log link function
+Final model is chosen to be Gamma GLM with log link with following predictors:
 
-### a)
-
+\codePrintStart
 ```{r}
-final_model <- glm(lifetime ~ skin_temp + humidity + activity_level +
-                   calibration_error + adhesive_type,
-                   data = df,
-                   family = Gamma(link = "log"))
-summary_table <- summary(final_model)$coefficients
-round(summary_table, 4)
+#| echo: false
+#| message: false
+#| warning: false
+round(summary(final_model)$coefficients, 4)
 ```
+\codePrintEnd
 
-### b)
+\nextpart
+
+Since BMI and experience are not in the final model, they do not affect the prediction. Using activity_level=4 and sample means for remaining predictors (`adhesive_type` = A as reference):
+
+\codePrintStart
 ```{r}
+#| echo: false
+#| message: false
+#| warning: false
 mean_skin_temp <- mean(df$skin_temp)
 mean_humidity <- mean(df$humidity)
 mean_cal_error <- mean(df$calibration_error)
 
-# adhesive A most prelevant so chose it
-# BMI is not present in my final model
-eta <- coef(final_model)["(Intercept)"] +
+pred <- coef(final_model)["(Intercept)"] +
        coef(final_model)["skin_temp"]*mean_skin_temp +
        coef(final_model)["humidity"]*mean_humidity +
        coef(final_model)["activity_level"]*4 +
        coef(final_model)["calibration_error"]*mean_cal_error
-
-fitted_value <- exp(eta)
-fitted_value
+       
+print(exp(pred))
 ```
+\codePrintEnd
+calculated by:
 
-### c)
+\upHalf
+$$ 
+\begin{aligned}
+&\hat{\mu} = \exp(\beta_0 + \beta_1 \cdot \text{skin temp} + \beta_2 \cdot \text{humidity} + \beta_3 \cdot \text{activity level} + \beta_4 \cdot \text{calibration error} + \text{adhesive effect}) \\
+&\text{adhesive effect is set to 0 here as we take the default, } A \text{ type, as the "mean"}
+\end{aligned}
+$$
 
-**YEAH MAKE PLOTS**
+Since experience was removed from the final model, changing experience by 1 year produces no significant change in expected lifetime.
 
-### d)
+\nextpart
+
+Plots presented here deliberatly cut off the lifetime >15 outlier points (only 4 of them) to increase visibility.
+As experience is not included as predictor in our final model following plot is made using default, full-fit model including all predictors.
+
+![](plots/AUX_Predicted_Lifetime_vs_Experience.png){width=60% fig-align="center"}
+
+As we can see, user experience does not seem to impact the liftime in a meaningfull way compared to our chosen predictors, which effect is clearly visible on the following plots:
+
+![](plots/Predicted_Lifetime_vs_Activity.png){width=50%}![](plots/Predicted_Lifetime_vs_CalibrationError.png){width=50%}
+![](plots/Predicted_Lifetime_vs_Humidity.png){width=50%}![](plots/Predicted_Lifetime_vs_SkinTemp.png){width=50%}
+
+\nextpart
+
+Final Model Deviance:
+\codePrintStart
 ```{r}
+#| echo: false
+#| message: false
+#| warning: false
 deviance(final_model)
+```
+\codePrintEnd
+\upHalf
+Final Model AIC:
+\codePrintStart
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
 AIC(final_model)
 ```
+\codePrintEnd
+\nextpart
 
-### e)
+Final Model's Dispersion parameter is:
+\codePrintStart
 ```{r}
+#| message: false
+#| warning: false
 summary(final_model)$dispersion
 ```
-this indicates underdispersion, could follow potentially with quasiGamma to fix it but underdispersion seems fine (not as bad as overdispersion, the fit is good)
+\codePrintEnd
 
-### f)
+This indicates underdispersion. While less problematic than overdispersion, this suggests the variance is smaller than expected under the Gamma model. The model fit quality seems enough, though a potential quasi-Gamma approach could be considered if precision is critical.
 
-**DO THAT ANALYSIS THO**
-User experience is not important and was removed from the final model
+\nextpart
+
+Sensor lifetime is significantly influenced by environmental and technical factors: higher skin temperature and higher humidity increases lifetime, while higher calibration_error and activity_level decrease it. Humidity shows the strongest effect, followed by calibration_error, while skin temperature and activity level have more modest impacts. User experience does not significantly impact sensor lifetime and was excluded from the final model. BMI and sweat rate were also deemed non-significant as predictors.
+
+\nexttask
 
 # Task 2
 
