@@ -280,10 +280,70 @@ Sensor lifetime is significantly influenced by environmental and technical facto
 
 # Task 2
 
+```{r}
+g = function(y, alpha) 
+{
+  out <- numeric(length(y))
+
+  # case 1: y >= 0, alpha != 0
+  in_1 = (y >= 0 & alpha != 0)
+  out[in_1] = (((y[in_1] + 1)^(alpha - 1)) / alpha)
+
+  # case 2: y >= 0, alpha == 0
+  in_2 = (y >= 0 & alpha == 0)
+  out[in_2] = log(y[in_2] + 1)
+
+  # case 3: y < 0, alpha != 2
+  in_3 = (y < 0 & alpha != 2)
+  out[in_3] = ( - ((((-y[in_3] + 1)^(2 - alpha)) - 1) / (2 - alpha)))
+
+  # case 4: y < 0, alpha == 2
+  in_4 = (y < 0 & alpha == 2)
+  out[in_4] = ( - log(-y[in_4] + 1))
+
+  return(out)
+}
+
+g_prim = function(y, alpha)
+{
+  out <- numeric(length(y))
+
+  # case 1: y >= 0
+  in_1 = (y >= 0)
+  out[in_1] = (y[in_1] + 1)^(alpha - 1)
+
+  # case 2: y < 0
+  in_2 = (y < 0)
+  out[in_2] = (1 - y[in_2])^(1 - alpha)
+
+  return(out)
+}
+
+profloglik = function(Y, X, alpha)
+{
+  n = length(Y)
+
+  # transformed Y
+  g_Y <- g(Y, alpha)
+
+  # B_hat estimate
+  B_hat = solve(t(X) %*% X) %*% t(X) %*% g_Y
+
+  # Residual Sum of Squares
+  RSS = sum((g_Y - X %*% B_hat)^2)
+
+  # Constants
+  constants = (-n/2)*log(2*pi) - (n/2)
+
+  # profile log likehood = -n/2 log(sigma_hat^2) + sum of log(g_prim(y)) + constants
+  out = (-(n/2))*log((1/n) * RSS) + sum(log(g_prim(Y, alpha))) + constants
+
+  return(out)
+}
+```
+
 ```{r, fig.width=18, fig.height=18}
 load("Data_Assignment2_Ex2_E2025.rdata")
 df_x <- x
 df_y <- Y
-str(df_x)
-str(df_y)
 ```
