@@ -115,21 +115,25 @@ print(sort(resid_dev))
 The Gamma distribution with log linking was selected based on lowest AIC. Even though Inverse Gaussian had slightly lower residual deviance, the substantial AIC difference ($\Delta \approx 80$) and the excessive cubic mean-variance relationship ($\mu^3$) were not necessary given the visually observed variance structure on the plots.
 It is worth bearing in mind the existance of cathegorical predictor in the model - `adhesive_type` - during the model selectio the p-value is low enough to consider it statistically significant.
 
-Full fit model can be tested for interaction using `(...)^2` syntax, I performed sensible pairwise tests for the predictors including their interaction terms, ie. relating `activity_level` to, for instance, `patient_bmi`, `sweat_rate` and `humidity`, relating `experience:humidity` or `experience:calibration_error` etc, yielded no statistically significant interaction terms between the predictors (their p-values were > 0.05)
+Full fit model can be tested for interaction using `(...)^2` syntax, I performed sensible pairwise tests for the predictors including their interaction terms, ie. relating `activity_level` to, for instance, `patient_bmi`, `sweat_rate` and `humidity`, relating `experience:humidity` or `experience:calibration_error` etc, yielded no statistically significant interaction terms between the predictors (their p-values were > 0.05). **However when testing individual interaction between each predictor and `adhesive_type` I noticed the existence of an interaction between `patient_bmi` and the aformentioned `adhesive_type`, what motivates the inclusion of this term in my model.**
 
 
 \nextpart
 
 We consider 2 different predictor selection methods:
 
-- Stepwise, based on AIC using `step()`:
+- Stepwise, based on AIC using `step()`, on default model with included `patient_bmi` interaction:
 ```{r}
 #| message: false
 #| warning: false
-Model_1 <- step(gamma_model_log, trace=0)
+Model_1 <- step(glm(lifetime ~ skin_temp + humidity + activity_level +
+                     sweat_rate + calibration_error +
+                     experience + patient_bmi * adhesive_type,
+                   data = df,
+                   family = Gamma(link = "log")), trace=0)
 ```
 
-- P-value based selection (threshold: p > 0.05):
+- P-value based selection (threshold: p < 0.05):
 
 \codePrintStart
 ```{r}
@@ -137,23 +141,24 @@ Model_1 <- step(gamma_model_log, trace=0)
 #| message: false
 #| warning: false
 round(summary(glm(lifetime ~ skin_temp + humidity + activity_level +
-                     sweat_rate + calibration_error + patient_bmi +
-                     experience + adhesive_type,
+                     sweat_rate + calibration_error + 
+                     experience + patient_bmi * adhesive_type,
                    data = df,
                    family = Gamma(link = "log")))$coefficients, 5)
 Model_2 <- glm(lifetime ~ skin_temp + humidity + activity_level +
-                     calibration_error + adhesive_type,
+                     calibration_error + patient_bmi * adhesive_type,
                    data = df,
                    family = Gamma(link = "log"))
+final_model = Model_2
 # summary(alt_best_model)
 ```
 \codePrintEnd
 
 Initial full model coefficients were deemed:
 
-- Significant (p < 0.05): humidity, calibration_error, skin_temp, activity_level
-- Non-significant : sweat_rate (p=0.545), experience (p=0.574), patient_bmi (p=0.187)
-- Adhesive type C showed significance (p=0.022), therefore all cathegorical predictors of `adhesive_type` retained.
+- Significant (p < 0.05): humidity, calibration_error, skin_temp, activity_level, patient_bmi
+- Non-significant : sweat_rate (p=0.635), experience (p=0.426),
+- Adhesive type C showed significance by interaction with bmi during testing, therefore all cathegorical predictors of `adhesive_type` retained.
 
 \nextpart
 
@@ -162,20 +167,7 @@ Comparison between two models:
 - Model 1 - step() best.
 - Model 2 - p-value based choice.
 
-\codePrintStart
-```{r}
-#| echo: false
-#| message: false
-#| warning: false
-print(anova(Model_1, Model_2))
-
-final_model = Model_2
-```
-\codePrintEnd
-
-After the stepwise model selection based on Akaike Information Criterion and selection based on p values. We end up with two models, different in one predictor - patient_bmi. We perform `anova()` test in order to choose one of them.
-
-The comparison shows insignificant difference in residual deviance therefore Model 2 is selected following parsimony principle - patient_bmi does not significantly improve the fit.
+Is not needed as after the stepwise model selection based on Akaike Information Criterion and selection based on p values we end up with the same model, different in one predictor.
 
 \nexttask
 
@@ -194,7 +186,7 @@ round(summary(final_model)$coefficients, 4)
 
 \nextpart
 
-Since BMI and experience are not in the final model, they do not affect the prediction. Using activity_level=4 and sample means for remaining predictors (`adhesive_type` = A as reference):
+Since experience is not in the final model, it does not not affect the prediction. Using patient_bmi = 30, activity_level=4 and sample means for remaining predictors (`adhesive_type` = A as reference):
 
 \codePrintStart
 ```{r}
@@ -206,10 +198,11 @@ mean_humidity <- mean(df$humidity)
 mean_cal_error <- mean(df$calibration_error)
 
 pred <- coef(final_model)["(Intercept)"] +
-       coef(final_model)["skin_temp"]*mean_skin_temp +
-       coef(final_model)["humidity"]*mean_humidity +
-       coef(final_model)["activity_level"]*4 +
-       coef(final_model)["calibration_error"]*mean_cal_error
+       coef(final_model)["skin_temp"] * mean_skin_temp +
+       coef(final_model)["humidity"] * mean_humidity +
+       coef(final_model)["activity_level"] * 4 +
+       coef(final_model)["calibration_error"] * mean_cal_error +
+       coef(final_model)["patient_bmi"] * 30
        
 print(exp(pred))
 ```
@@ -219,10 +212,10 @@ calculated by:
 \upHalf
 $$ 
 \begin{aligned}
-&\hat{\mu} = \exp(\beta_0 + \beta_1 \cdot \text{skin temp} + \beta_2 \cdot \text{humidity} + \beta_3 \cdot \text{activity level} + \beta_4 \cdot \text{calibration error} + \text{adhesive effect}) \\
-&\text{adhesive effect is set to 0 here as we take the default, } A \text{ type, as the "mean"}
+&\hat{\mu} = \exp(\beta_0 + \beta_1 \cdot x_\text{skin temp} + \beta_2 \cdot x_\text{humidity} + \beta_3 \cdot x_\text{activity level} + \beta_4 \cdot x_\text{calibration error} + \beta_5 \cdot x_\text{patient bmi} + ...) \\
 \end{aligned}
 $$
+Where "..." normally represent the `adhesive_type` and interaction terms between `patien_bmi` and `adhesive_type`, however in our case they are all set to 0, because we use adhesive type A, which is the reference category in R (and also the most common type in the data).
 
 Since experience was removed from the final model, changing experience by 1 year produces no significant change in expected lifetime.
 
@@ -237,6 +230,10 @@ As we can see, user experience does not seem to impact the liftime in a meaningf
 
 ![](plots/Predicted_Lifetime_vs_Activity.png){width=50%}![](plots/Predicted_Lifetime_vs_CalibrationError.png){width=50%}
 ![](plots/Predicted_Lifetime_vs_Humidity.png){width=50%}![](plots/Predicted_Lifetime_vs_SkinTemp.png){width=50%}
+![](plots/Predicted_Lifetime_vs_AdhesvieAndBMI.png){width=80% fig_align="center"}
+
+Here we can clearly see why the inclusion of the interaction term is necessary.
+The effect of adhesive type on sensor lifetime varies with patient BMI, as indicated by the differing slopes of the predicted curves.
 
 \nextpart
 
@@ -274,7 +271,7 @@ This indicates underdispersion. While less problematic than overdispersion, this
 
 \nextpart
 
-Sensor lifetime is significantly influenced by environmental and technical factors: higher skin temperature and higher humidity increases lifetime, while higher calibration_error and activity_level decrease it. Humidity shows the strongest effect, followed by calibration_error, while skin temperature and activity level have more modest impacts. User experience does not significantly impact sensor lifetime and was excluded from the final model. BMI and sweat rate were also deemed non-significant as predictors.
+Sensor lifetime is significantly influenced by environmental and technical factors: higher skin temperature and higher humidity increases lifetime, while higher calibration_error and activity_level decrease it. Humidity shows the strongest effect, followed by calibration_error, while skin temperature and activity level have more modest impacts. The data points strongly towards an interaction between `patien_bmi` and `adhesive_type` meaning that their specific combination influences the results in a different way. User experience, along with their sweat rate, do not significantly impact sensor lifetime and were excluded from the final model.
 
 \nexttask
 
@@ -389,11 +386,13 @@ $$
 
 \nextpart
 
-Implementation of those functions in R looks as follows:
+I decided to write $g_\alpha$ and $\dot{g}_\alpha$ in such way so that they can be aplied vector-wise and not element-wise.
+Implementation of all the functions in R looks as follows:
 
 ```{r}
 #| message: false
 #| warning: false
+
 g = function(y, alpha) {
   out <- numeric(length(y))
 
@@ -415,7 +414,11 @@ g = function(y, alpha) {
 
   return(out)
 }
+```
 
+\newpage
+
+```{r}
 g_prim = function(y, alpha) {
   out <- numeric(length(y))
 
@@ -451,6 +454,8 @@ profile_log_likelihood = function(Y, X, alpha) {
   return(out)
 }
 ```
+
+\nextpart
 
 We then load the data, add intercept term and find the ML estimate using `optim()`
 ```{r}

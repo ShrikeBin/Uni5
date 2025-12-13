@@ -61,48 +61,27 @@ print(sort(aic_values))
 resid_dev <- sapply(models, function(m) if("deviance" %in% names(m)) m$deviance else NA)
 print(sort(resid_dev))
 
-
-
-cat("\n=== Stepwise selection for Gamma_Log ===\n")
-best_model <- step(gamma_model_log)
-summary(best_model)
-
-cat("\n=== P value selection for Gamma_Log ===\n")
-alt_best_model <- glm(lifetime ~ skin_temp + humidity + activity_level +
-                     calibration_error + adhesive_type,
-                   data = df,
-                   family = Gamma(link = "log"))
-summary(alt_best_model)
-
-anova(best_model, alt_best_model)
-
-final_model = alt_best_model
-
-
-
 final_model <- glm(lifetime ~ skin_temp + humidity + activity_level +
-                   calibration_error + adhesive_type,
+                   calibration_error + patient_bmi * adhesive_type,
                    data = df,
                    family = Gamma(link = "log"))
 summary_table <- summary(final_model)$coefficients
 round(summary_table, 4)
 
-
-
-
 mean_skin_temp <- mean(df$skin_temp)
 mean_humidity <- mean(df$humidity)
 mean_cal_error <- mean(df$calibration_error)
 
-# adhesive A most prelevant so chose it
-# BMI is not present in my final model
-eta <- coef(final_model)["(Intercept)"] +
-       coef(final_model)["skin_temp"]*mean_skin_temp +
-       coef(final_model)["humidity"]*mean_humidity +
-       coef(final_model)["activity_level"]*4 +
-       coef(final_model)["calibration_error"]*mean_cal_error
+pred <- coef(final_model)["(Intercept)"] +
+       coef(final_model)["skin_temp"] * mean_skin_temp +
+       coef(final_model)["humidity"] * mean_humidity +
+       coef(final_model)["activity_level"] * 4 +
+       coef(final_model)["calibration_error"] * mean_cal_error +
+       coef(final_model)["patient_bmi"] * 30
+       
+print(exp(pred))
 
-fitted_value <- exp(eta)
+fitted_value <- exp(pred)
 fitted_value
 
 
@@ -121,6 +100,7 @@ mean_skin_temp <- mean(df$skin_temp)
 mean_humidity <- mean(df$humidity)
 mean_activity <- mean(df$activity_level)
 mean_cal_error <- mean(df$calibration_error)
+mean_patient_bmi <- mean(df$patient_bmi)
 
 # Reference adhesive
 ref_adhesive <- levels(df$adhesive_type)[1]
@@ -139,6 +119,7 @@ pred_skin <- data.frame(
   humidity = mean_humidity,
   activity_level = mean_activity,
   calibration_error = mean_cal_error,
+  patient_bmi = mean_patient_bmi,
   adhesive_type = ref_adhesive
 )
 pred_skin$pred_lifetime <- predict(final_model, newdata = pred_skin, type = "response")
@@ -157,6 +138,7 @@ pred_hum <- data.frame(
   skin_temp = mean_skin_temp,
   activity_level = mean_activity,
   calibration_error = mean_cal_error,
+  patient_bmi = mean_patient_bmi,
   adhesive_type = ref_adhesive
 )
 pred_hum$pred_lifetime <- predict(final_model, newdata = pred_hum, type = "response")
@@ -175,6 +157,7 @@ pred_act <- data.frame(
   skin_temp = mean_skin_temp,
   humidity = mean_humidity,
   calibration_error = mean_cal_error,
+  patient_bmi = mean_patient_bmi,
   adhesive_type = ref_adhesive
 )
 pred_act$pred_lifetime <- predict(final_model, newdata = pred_act, type = "response")
@@ -193,6 +176,7 @@ pred_cal <- data.frame(
   skin_temp = mean_skin_temp,
   humidity = mean_humidity,
   activity_level = mean_activity,
+  patient_bmi = mean_patient_bmi,
   adhesive_type = ref_adhesive
 )
 pred_cal$pred_lifetime <- predict(final_model, newdata = pred_cal, type = "response")
@@ -205,22 +189,53 @@ ggplot(pred_cal, aes(x = calibration_error, y = pred_lifetime)) +
   labs(title="Predicted Lifetime vs Calibration Error", x="Calibration Error", y="Predicted Lifetime")
 dev.off()
 
-# --- 6. Predicted Lifetime vs Adhesive Type ---
-pred_adh <- data.frame(
-  skin_temp = mean_skin_temp,
-  humidity = mean_humidity,
-  activity_level = mean_activity,
-  calibration_error = mean_cal_error,
+# --- Predicted Lifetime vs BMI (3 adhesive curves) ---
+
+pred_bmi <- expand.grid(
+  patient_bmi = seq(min(df$patient_bmi),
+                    max(df$patient_bmi),
+                    length.out = 100),
   adhesive_type = levels(df$adhesive_type)
 )
-pred_adh$pred_lifetime <- predict(final_model, newdata = pred_adh, type = "response")
 
-png("Predicted_Lifetime_vs_AdhesiveType.png", width=900, height=600, res=150)
-ggplot(pred_adh, aes(x = adhesive_type, y = pred_lifetime)) +
-  geom_col(fill="orange") +
+pred_bmi$skin_temp <- mean_skin_temp
+pred_bmi$humidity <- mean_humidity
+pred_bmi$activity_level <- mean_activity
+pred_bmi$calibration_error <- mean_cal_error
+
+
+pred_bmi$pred_lifetime <- predict(
+  final_model,
+  newdata = pred_bmi,
+  type = "response"
+)
+
+png("Predicted_Lifetime_vs_AdhesvieAndBMI.png",
+    width = 900, height = 600, res = 150)
+
+ggplot(pred_bmi,
+       aes(x = patient_bmi,
+           y = pred_lifetime,
+           color = adhesive_type)) +
+  geom_line(linewidth = 0.7) +
+  geom_point(
+    data = subset(df, lifetime <= 15),
+    aes(x = patient_bmi,
+        y = lifetime),
+    alpha = 0.15,
+    inherit.aes = FALSE
+  ) +
   theme_minimal() +
-  labs(title="Predicted Lifetime vs Adhesive Type", x="Adhesive Type", y="Predicted Lifetime")
+  labs(
+    title = "Predicted Lifetime vs Patient BMI by Adhesive Type",
+    x = "Patient BMI",
+    y = "Lifetime",
+    color = "Adhesive type"
+  )
+
+
 dev.off()
+
 
 png("Deviance_vs_Fitted.png", width=900, height=600, res=150)
 res <- residuals(final_model, type = "deviance")
