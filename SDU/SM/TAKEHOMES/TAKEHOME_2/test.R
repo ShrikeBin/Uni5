@@ -48,3 +48,27 @@ summary(alt)
 summary(tester)
 
 anova(final, tester)
+
+
+model_max <- glm(lifetime ~ (skin_temp + humidity + activity_level +
+                     sweat_rate + calibration_error + patient_bmi +
+                     experience + adhesive_type)^2,
+                   data = df,
+                   family = Gamma(link = "log"))
+
+model_max_alt <- step(model_max, trace=0)
+
+summary(model_max)
+
+summary(model_max_alt)
+
+etc <- glm(lifetime ~ skin_temp + humidity + activity_level + 
+    sweat_rate + calibration_error + patient_bmi + experience + 
+    adhesive_type + 
+    humidity:experience +
+    sweat_rate:calibration_error +
+    patient_bmi:adhesive_type, family = Gamma(link = "log"), 
+    data = df)
+
+
+summary(final)

@@ -164,10 +164,10 @@ Initial full model coefficients were deemed:
 
 Comparison between two models:
 
-- Model 1 - step() best.
-- Model 2 - p-value based choice.
+- Model 1 - step() best on default model with included `patient_bmi` interaction.
+- Model 2 - p-value based choice on default model with included `patient_bmi` interaction.
 
-Is not needed as after the stepwise model selection based on Akaike Information Criterion and selection based on p values we end up with the same model, different in one predictor.
+Is not needed as after the stepwise model selection based on Akaike Information Criterion and selection based on p values we end up with the same model, different in one predictor. After that I decided to try running `step()` command on a model with all pairwise interactions (`(...)^2` for all predictors). It returend a model with lower AIC (~19 lower), but it included all predictors and a lot of additional interactions (additional 18 (!) terms) that were less interpretable. In the following tasks I will be using the parsimonious Model 2 (equal to Model 1) for clarity and meaningful interpretation, balancing it with the quality of fit.
 
 \nexttask
 
