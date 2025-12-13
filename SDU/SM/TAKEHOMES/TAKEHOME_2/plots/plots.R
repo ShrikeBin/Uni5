@@ -221,7 +221,8 @@ ggplot(pred_bmi,
   geom_point(
     data = subset(df, lifetime <= 15),
     aes(x = patient_bmi,
-        y = lifetime),
+        y = lifetime,
+        color = adhesive_type),
     alpha = 0.15,
     inherit.aes = FALSE
   ) +
