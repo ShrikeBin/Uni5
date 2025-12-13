@@ -280,9 +280,121 @@ Sensor lifetime is significantly influenced by environmental and technical facto
 
 # Task 2
 
+Because our transformation $g_\alpha$ is monotonically increasing (trivial checks for $y \geq 0$ and $y < 0$)
+$$
+P(Y_i < y_i) = P(g_\alpha(Y_i) < g_\alpha(y_i))
+$$
+
+And since $g_\alpha(Y_i)$ is normally distributed, we can use the standard normal CDF $\Phi$ with normalized $Y_i$ with its mean and standard error:
+
+$$
+P(Y_i < y_i) = \Phi\left(\frac{g_\alpha(y_i) - \mathbf{x}_i^\top \beta}{\sigma}\right)
+$$
+
+Taking the derivative with respect to $y_i$ gives us:
+
+$$
+\frac{d}{dy_i} P(Y_i < y_i) = \phi\left(\frac{g_\alpha(y_i) - \mathbf{x}_i^\top \beta}{\sigma}\right) \cdot \frac{\dot{g}_\alpha(y_i)}{\sigma}
+$$
+
+where $\phi$ is the standard normal density and $\dot{g}_\alpha(y_i)$ being the derivative of $g_\alpha(y_i)$ defined as:
+
+$$
+\dot{g}_\alpha(y_i) =
+\begin{cases}
+(y_i + 1)^{\alpha - 1}, & y \ge 0 \\[6pt]
+(1- y_i)^{1 - \alpha}, & y < 0
+\end{cases}
+$$
+
+The final density of $Y_i$ is:
+
+$$
+\begin{aligned}
+f_{Y_i}(y_i) =& \phi\left(\frac{g_\alpha(y_i) - \mathbf{x}_i^\top \beta}{\sigma}\right) \cdot \frac{\dot{g}_\alpha(y_i)}{\sigma} = \\
+=&\frac{1}{\sqrt{2\pi}}
+\exp\Bigg\{ -\frac{1}{2} \left(\frac{g_\alpha(y_i) - \mathbf{x}_i^\top \beta}{\sigma}\right)^2 \Bigg\} 
+\cdot \frac{\dot{g}_\alpha(y_i)}{\sigma}
+\end{aligned}
+$$
+
+\nextpart
+
+$$
+\ell(\alpha, \beta, \sigma^2; y_1, \dots, y_n) 
+= \sum_{i=1}^{n} \log f_{Y_i}(y_i)
+$$
+
+For independent $Y_i$ with density $f_{Y_i}$, this becomes:
+
+$$
+\ell(\alpha, \beta, \sigma^2; y_1, \dots, y_n)
+= \log \Bigg[
+\prod_{i=1}^{n} 
+\frac{1}{\sqrt{2\pi}} 
+\exp\Bigg\{ -\frac{1}{2} \left(\frac{g_\alpha(y_i) - \mathbf{x}_i^\top \beta}{\sigma}\right)^2 \Bigg\} 
+\cdot \frac{\dot{g}_\alpha(y_i)}{\sigma}
+\Bigg]
+$$
+
+\nextpart
+
+The estimates derived from equating the derivative of loglikelihood with respect to $\beta$ and $\sigma$ to 0 (as we did on the lecture) are:
+
+$$
+\hat{\beta} = (\mathbf{X}^\top \mathbf{X})^{-1} \mathbf{X}^\top g_\alpha(\mathbf{Y})
+$$
+
+$$
+\hat{\sigma}^2 = \frac{1}{n} RSS_g
+$$
+
+Where
+$$
+RSS_g = \sum_{i=1}^{n} \Big( g_\alpha(y_i) - \mathbf{x}_i^\top \hat{\beta} \Big)^2 
+$$
+
+\nextpart
+
+$$
+l(\alpha; y_1, \dots, y_n) 
+= 
+\log \Bigg[
+\prod_{i=1}^{n} 
+\frac{1}{\sqrt{2\pi}} 
+\exp\Bigg\{ -\frac{1}{2} \left(\frac{g_\alpha(y_i) - \mathbf{x}_i^\top \hat{\beta}}{\hat{\sigma}}\right)^2 \Bigg\} 
+\cdot \frac{\dot{g}_\alpha(y_i)}{\hat{\sigma}}
+\Bigg]
+$$
+
+Which equals to:
+
+$$
+= -\frac{n}{2} \log(2\pi) - \frac{1}{2 \hat{\sigma}^2} \sum_{i=1}^{n} \Big( g_\alpha(y_i) - \mathbf{x}_i^\top \hat{\beta} \Big)^2 
++ \sum_{i=1}^{n} \log \dot{g}_\alpha(y_i) - n \log(\hat{\sigma})
+$$
+
+Reduced by substituting $RSS_g = \sum_{i=1}^{n} \Big( g_\alpha(y_i) - \mathbf{x}_i^\top \hat{\beta} \Big)^2$ and $\hat{\sigma}^2 = \frac{1}{n} RSS_g$:
+
+$$
+-\frac{n}{2} \log(2\pi) - \frac{n}{2} + \sum_{i=1}^{n} \log \dot{g}_\alpha(y_i) - n \log(\sqrt{\frac{RSS_g}{n}})
+$$
+
+And further into:
+
+$$
+l(\alpha; y_1, \dots, y_n) 
+= \sum_{i=1}^{n} \log \dot{g}_\alpha(y_i) - \frac{n}{2} \log(\frac{RSS_g}{n}) + const.
+$$
+
+\nextpart
+
+Implementation of those functions in R looks as follows:
+
 ```{r}
-g = function(y, alpha) 
-{
+#| message: false
+#| warning: false
+g = function(y, alpha) {
   out <- numeric(length(y))
 
   # case 1: y >= 0, alpha != 0
@@ -304,8 +416,7 @@ g = function(y, alpha)
   return(out)
 }
 
-g_prim = function(y, alpha)
-{
+g_prim = function(y, alpha) {
   out <- numeric(length(y))
 
   # case 1: y >= 0
@@ -319,8 +430,7 @@ g_prim = function(y, alpha)
   return(out)
 }
 
-profloglik = function(Y, X, alpha)
-{
+profile_log_likelihood = function(Y, X, alpha) {
   n = length(Y)
 
   # transformed Y
@@ -335,15 +445,39 @@ profloglik = function(Y, X, alpha)
   # Constants
   constants = (-n/2)*log(2*pi) - (n/2)
 
-  # profile log likehood = -n/2 log(sigma_hat^2) + sum of log(g_prim(y)) + constants
-  out = (-(n/2))*log((1/n) * RSS) + sum(log(g_prim(Y, alpha))) + constants
+  # profile log likehood = sum of log(g_prim(y)) -n/2 log(sigma_hat^2) + constants
+  out = sum(log(g_prim(Y, alpha))) - ((n/2)*log((1/n) * RSS)) + constants
 
   return(out)
 }
 ```
 
-```{r, fig.width=18, fig.height=18}
+We then load the data, add intercept term and find the ML estimate using `optim()`
+```{r}
+#| message: false
+#| warning: false
 load("Data_Assignment2_Ex2_E2025.rdata")
-df_x <- x
+df_x <- cbind(1, x)
 df_y <- Y
+
+out <- optim(
+  par = 0,
+  fn = function(a) {-profile_log_likelihood(df_y, df_x, a)}
+)
 ```
+
+We plot the values of loglik funciton spread in $\pm$ 0.1 around from `out$par` (which is the result of the optimization) with step of 0.001:
+
+![](plots/Loglik.png){width=70% fig-align="center"}
+
+As we can see $\hat{\alpha} \approx 1.8$
+
+Final transformation is then (by substituting $\alpha = 1.8$):
+
+$$
+g_\alpha(Y) =
+\begin{cases}
+\dfrac{(Y+1)^{1.8} - 1}{1.8}, & y \ge 0\\[6pt]
+-\dfrac{(-Y+1)^{0.2} - 1}{0.2}, & y < 0\\[6pt]
+\end{cases}
+$$
