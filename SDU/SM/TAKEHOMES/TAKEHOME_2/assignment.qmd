@@ -89,10 +89,23 @@ inv_gauss_model_log <- glm(lifetime ~ skin_temp + humidity + activity_level +
                          experience + adhesive_type,
                        data = df,
                        family = inverse.gaussian(link = "log"))
+log_normal <- glm(lifetime ~ skin_temp + humidity + activity_level +
+                     sweat_rate + calibration_error + patient_bmi +
+                     experience + adhesive_type,
+                   data = df,
+                   family = gaussian(link = "log"))
+normal <- glm(lifetime ~ skin_temp + humidity + activity_level +
+                     sweat_rate + calibration_error + patient_bmi +
+                     experience + adhesive_type,
+                   data = df,
+                   family = gaussian(link = "identity"))
+
 models <- list(
   Gamma_Log = gamma_model_log,
   Gamma_Canonical= gamma_model_canon,
-  Inv_Gaussian_Log = inv_gauss_model_log
+  Inv_Gaussian_Log = inv_gauss_model_log,
+  Normal_Log = log_normal,
+  Normal=normal
 )
 
 aic_values <- sapply(models, AIC)
@@ -112,10 +125,9 @@ print(sort(resid_dev))
 ```
 \codePrintEnd
 
-The Gamma distribution with log linking was selected based on lowest AIC. Even though Inverse Gaussian had slightly lower residual deviance, the substantial AIC difference ($\Delta \approx 80$) and the excessive cubic mean-variance relationship ($\mu^3$) were not necessary given the visually observed variance structure on the plots.
-It is worth bearing in mind the existance of cathegorical predictor in the model - `adhesive_type` - during the model selectio the p-value is low enough to consider it statistically significant.
+The Gamma distribution with log linking was selected based on lowest AIC. Even though Inverse Gaussian had slightly lower residual deviance, the substantial AIC difference ($\Delta \approx 80$) and the excessive cubic mean-variance relationship ($\mu^3$) were not necessary given the visually observed variance structure on the plots. As a test I also tried fitting Normal (Gaussian) model with both log link and identity (where the second case is equal to fitting just *normal linear model*). Those two however perforemd significantly worse compared to Gamma or Inverse Gaussian fits.
 
-Full fit model can be tested for interaction using `(...)^2` syntax, I performed sensible pairwise tests for the predictors including their interaction terms, ie. relating `activity_level` to, for instance, `patient_bmi`, `sweat_rate` and `humidity`, relating `experience:humidity` or `experience:calibration_error` etc, yielded no statistically significant interaction terms between the predictors (their p-values were > 0.05). **However when testing individual interaction between each predictor and `adhesive_type` I noticed the existence of an interaction between `patient_bmi` and the aformentioned `adhesive_type`, what motivates the inclusion of this term in my model.**
+Full fit model can be tested for interaction using `(...)^2` syntax, I performed sensible pairwise tests for the predictors including their interaction terms, ie. relating `activity_level` to, for instance, `patient_bmi`, `sweat_rate` and `humidity`, relating `experience:humidity` or `experience:calibration_error` etc. Those comparisons yielded no statistically significant interaction terms between the majority of predictors (interaction terms p-values were >> 0.05). **However when testing individual interaction between each predictor and `adhesive_type` I noticed the existence of a significant interaction between `patient_bmi` and the aformentioned `adhesive_type`, what motivates the inclusion of this term in my model.**
 
 
 \nextpart
@@ -156,8 +168,8 @@ final_model = Model_2
 
 Initial full model coefficients were deemed:
 
-- Significant (p < 0.05): humidity, calibration_error, skin_temp, activity_level, patient_bmi
-- Non-significant : sweat_rate (p=0.635), experience (p=0.426),
+- Significant (p < 0.05): `humidity`, `calibration_error`, `skin_temp`, `activity_level`, `patient_bmi`
+- Non-significant : `sweat_rate` (p=0.635), `experience` (p=0.426),
 - Adhesive type C showed significance by interaction with bmi during testing, therefore all cathegorical predictors of `adhesive_type` retained.
 
 \nextpart

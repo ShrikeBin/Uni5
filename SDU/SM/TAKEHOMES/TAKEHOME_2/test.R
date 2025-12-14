@@ -72,3 +72,12 @@ etc <- glm(lifetime ~ skin_temp + humidity + activity_level +
 
 
 summary(final)
+
+
+test <- glm(lifetime ~ skin_temp + humidity + activity_level +
+                     sweat_rate + calibration_error + patient_bmi +
+                     experience + adhesive_type,
+                   data = df,
+                   family = gaussian(link = "log"))
+
+summary(test)
