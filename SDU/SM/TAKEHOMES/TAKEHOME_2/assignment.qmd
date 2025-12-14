@@ -279,11 +279,11 @@ summary(final_model)$dispersion
 ```
 \codePrintEnd
 
-This indicates underdispersion. While less problematic than overdispersion, this suggests the variance is smaller than expected under the Gamma model. The model fit quality seems enough, though a potential quasi-Gamma approach could be considered if precision is critical.
+As Gamma belongs to *Exponential Dispersion Model* family it does not really make sense to talk about over- or underdispersion as its second parameter captures the additional changes in variation (well, that what EDMs are for). In models with only one parameter this value of $\sigma^2 \approx 0.15$ would signify underdispersion.
 
 \nextpart
 
-Sensor lifetime is significantly influenced by environmental and technical factors: higher skin temperature and higher humidity increases lifetime, while higher calibration_error and activity_level decrease it. Humidity shows the strongest effect, followed by calibration_error, while skin temperature and activity level have more modest impacts. The data points strongly towards an interaction between `patien_bmi` and `adhesive_type` meaning that their specific combination influences the results in a different way. User experience, along with their sweat rate, do not significantly impact sensor lifetime and were excluded from the final model.
+Sensor lifetime is significantly influenced by environmental and technical factors: higher `skin_temperature `and higher `humidity` increases lifetime, while higher `calibration_error` and `activity_level` decrease it. `Humidity` shows the strongest effect, followed by `calibration_error`, while `skin temperature` and `activity level` have more modest impacts. The data points strongly towards an interaction between `patien_bmi` and `adhesive_type` meaning that their specific combination influences the results in a different way. `User experience`, along with their `sweat rate`, do not significantly impact sensor lifetime and were excluded from the final model.
 
 \nexttask
 
